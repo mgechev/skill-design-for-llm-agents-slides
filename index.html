@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill Design for LLM Agents — Minko Gechev</title>
+  <meta name="description" content="AI Coding Summit July 2026 — Writing good skills that actually work">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="slides-container" id="presentation">
+
+    <!-- SLIDE 1: Title -->
+    <section class="slide active" id="slide-1">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .title-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: #000000;
+            z-index: 2;
+            position: relative;
+            text-align: center;
+          }
+
+          .title-content-block {
+            max-width: 540px;
+            padding: 0 20px;
+            margin-top: 55px;
+          }
+
+          .main-title {
+            font-size: 44px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.04em;
+            color: #ffffff;
+            margin-bottom: 12px;
+            margin-top: 0;
+          }
+
+          .subtitle {
+            font-size: 15px;
+            color: var(--gray-60);
+            font-weight: 400;
+            margin-bottom: 28px;
+            margin-top: 0;
+          }
+
+          .divider {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.05) 100%);
+            margin: 0 auto 24px auto;
+          }
+
+          .author {
+            font-size: 12px;
+            color: #ffffff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin: 0;
+            opacity: 0.85;
+          }
+        </style>
+        <div class="slide-content title-layout">
+          <div class="title-content-block">
+            <h1 class="main-title">Skill Design<br>for LLM Agents</h1>
+            <p class="subtitle">Writing good skills that actually work</p>
+            <div class="divider"></div>
+            <p class="author">Minko Gechev</p>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 2: Agentic systems -->
+    <section class="slide" id="slide-2">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content s2-layout">
+          <h2 class="s2-title">Agentic systems</h2>
+          <div class="s2-imgs">
+            <img src="assets/1.gif"
+              style="position: absolute; left: 25.25px; top: 97.23px; width: 314px; height: 261.27px; z-index: 2;"
+              alt="">
+            <img src="assets/2.gif"
+              style="position: absolute; left: 362.05px; top: 97.23px; width: 317.7px; height: 264.34px; z-index: 2;"
+              alt="">
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 3: How agents work? (base) -->
+    <section class="slide" id="slide-3">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">How agents work?</h2>
+        </div>
+        <div class="diagram">
+          <div class="node-label" style="left:205.44px;top:182.11px">User</div>
+          <div class="node" style="left:295.94px;top:156.5px">Agent</div>
+          <div class="node" style="left:435.18px;top:156.5px">LLM</div>
+          <div class="tools-stack">
+            <div class="tools-card" style="left:309.31px;top:244.83px"></div>
+            <div class="tools-card" style="left:301.91px;top:252.69px"></div>
+            <div class="tools-card" style="left:293.44px;top:260.86px">Tools</div>
+          </div>
+          <svg width="720" height="405" style="position:absolute;inset:0;pointer-events:none">
+            <!-- User <-> Agent -->
+            <line x1="243.78" y1="189.78" x2="293.37" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <!-- Agent <-> LLM -->
+            <line x1="390.68" y1="189.78" x2="432.62" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <!-- Agent <-> Tools -->
+            <line x1="342.03" y1="225.63" x2="342.07" y2="242.27" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          </svg>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 4: How agents work? + MCP -->
+    <section class="slide" id="slide-4">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">How agents work?<span class="sub">Model Context Protocol</span></h2>
+        </div>
+        <div class="diagram">
+          <div class="node-label" style="left:155.73px;top:174.86px">User</div>
+          <div class="node" style="left:246.22px;top:149.24px">Agent</div>
+          <div class="node" style="left:385.46px;top:149.24px">LLM</div>
+          <div class="tools-stack">
+            <div class="tools-card" style="left:259.59px;top:237.58px"></div>
+            <div class="tools-card" style="left:252.20px;top:245.43px"></div>
+            <div class="tools-card" style="left:243.73px;top:253.61px">Tools</div>
+            <span class="badge"
+              style="position:absolute;left:243.73px;top:313px;width:65.52px;text-align:center">(built-in)</span>
+          </div>
+          <div class="node mcp-node" style="left:419.82px;top:263.11px">MCP server</div>
+          <div class="node-label" style="left:350.92px;top:244.45px;line-height:1.2">ask for</div>
+          <div class="node-label" style="left:356.46px;top:258.85px;line-height:1.2">tools</div>
+          <svg width="720" height="405" style="position:absolute;inset:0;pointer-events:none">
+            <!-- User <-> Agent -->
+            <line x1="194.06" y1="182.53" x2="243.65" y2="182.53" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <!-- Agent <-> LLM -->
+            <line x1="340.97" y1="182.53" x2="382.90" y2="182.53" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <!-- Agent <-> Tools -->
+            <line x1="292.31" y1="218.38" x2="292.35" y2="235.02" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <!-- Agent <-> MCP server -->
+            <line x1="340.37" y1="217.32" x2="416.37" y2="261.19" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          </svg>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 5: Common agent architectures -->
+    <section class="slide" id="slide-5">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .slide-content {
+            padding-top: 19.8px;
+          }
+
+          .slide-header {
+            margin-bottom: 12px;
+          }
+
+          .bullet-list {
+            margin-top: 15px;
+          }
+
+          .bullet-list>li {
+            font-size: 16px;
+            line-height: 1.3;
+            margin-bottom: 9px;
+          }
+
+          .bullet-list>li::before {
+            line-height: 1.5;
+          }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Common agent architectures</h2>
+          <ul class="bullet-list">
+            <li><strong>ReAct</strong> (Reason + Act) - agent loops between thought generation, action, and observation
+              until the goal is met.</li>
+            <li><strong>Plan-and-Execute</strong> - agent creates a full, multi-step plan upfront and adjusts it while
+              executing each task.</li>
+            <li><strong>Reflexion</strong> (Self-Correction) - agent evaluates its performance post-task, using internal
+              feedback to improve future attempts.</li>
+            <li><strong>State Machine-Based Agents</strong> - agent's reasoning and tool use are strictly confined by a
+              predefined flowchart, ensuring reliable execution.</li>
+            <li><strong>Hybrid</strong> - popular agents often include a mixture of the architectures from above</li>
+          </ul>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDES 6-13: Simplified ReAct loop (code walk-through) -->
+    <section class="slide" id="slide-6">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line hl">user_prompt := get_user_prompt()</span>
+<span class="line hl">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line">while true {</span>
+<span class="line">    tools := get_available_tools()</span>
+<span class="line">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line">    if response.done {</span>
+<span class="line">        break</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    if response.tool_calls {</span>
+<span class="line">        result := call_tools(response.tool_calls)</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    context := context + result</span>
+<span class="line">}</span></pre>
+            <div class="code-desc">Setting up initial context based on the user prompt and the system instructions</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-7">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">user_prompt := get_user_prompt()</span>
+<span class="line">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line hl">while true {</span>
+<span class="line">    tools := get_available_tools()</span>
+<span class="line">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line">    if response.done {</span>
+<span class="line">        break</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    if response.tool_calls {</span>
+<span class="line">        result := call_tools(response.tool_calls)</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    context := context + result</span>
+<span class="line hl">}</span></pre>
+            <div class="code-desc">Entering the ReAct loop</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-8">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">user_prompt := get_user_prompt()</span>
+<span class="line">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line">while true {</span>
+<span class="line hl">    tools := get_available_tools()</span>
+<span class="line hl">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line">    if response.done {</span>
+<span class="line">        break</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    if response.tool_calls {</span>
+<span class="line">        result := call_tools(response.tool_calls)</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    context := context + result</span>
+<span class="line">}</span></pre>
+            <div class="code-desc">Sharing the list of available tools and asking the LLM how to proceed with the user
+              request</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-9">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">user_prompt := get_user_prompt()</span>
+<span class="line">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line">while true {</span>
+<span class="line">    tools := get_available_tools()</span>
+<span class="line">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line hl">    if response.done {</span>
+<span class="line hl">        break</span>
+<span class="line hl">    }</span>
+<span class="line"></span>
+<span class="line">    if response.tool_calls {</span>
+<span class="line">        result := call_tools(response.tool_calls)</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    context := context + result</span>
+<span class="line">}</span></pre>
+            <div class="code-desc">We stop if the LLM tells us we're done</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-10">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">user_prompt := get_user_prompt()</span>
+<span class="line">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line">while true {</span>
+<span class="line">    tools := get_available_tools()</span>
+<span class="line">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line">    if response.done {</span>
+<span class="line">        break</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line hl">    if response.tool_calls {</span>
+<span class="line hl">        result := call_tools(response.tool_calls)</span>
+<span class="line hl">    }</span>
+<span class="line"></span>
+<span class="line">    context := context + result</span>
+<span class="line">}</span></pre>
+            <div class="code-desc">If the LLM proposed to call tools, we call them with the parameters the LLM specified
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-11">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">user_prompt := get_user_prompt()</span>
+<span class="line">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line">while true {</span>
+<span class="line">    tools := get_available_tools()</span>
+<span class="line">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line">    if response.done {</span>
+<span class="line">        break</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    if response.tool_calls {</span>
+<span class="line">        result := call_tools(response.tool_calls)</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line hl">    context := context + result</span>
+<span class="line">}</span></pre>
+            <div class="code-desc">We update the context with the result from the tool calls and continue</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-12">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">user_prompt := get_user_prompt()</span>
+<span class="line">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line">while true {</span>
+<span class="line">    tools := get_available_tools()</span>
+<span class="line">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line">    if response.done {</span>
+<span class="line">        break</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    if response.tool_calls {</span>
+<span class="line">        result := call_tools(response.tool_calls)</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    context := context + result</span>
+<span class="line">}</span></pre>
+            <div class="code-desc">In large loops we can get context rot</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-13">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">Simplified ReAct loop</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">user_prompt := get_user_prompt()</span>
+<span class="line">context := user_prompt + system_instructions</span>
+<span class="line"></span>
+<span class="line">while true {</span>
+<span class="line">    tools := get_available_tools()</span>
+<span class="line">    response := ask_llm_what_to_do(tools, context)</span>
+<span class="line"></span>
+<span class="line">    if response.done {</span>
+<span class="line">        break</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    if response.tool_calls {</span>
+<span class="line">        result := call_tools(response.tool_calls)</span>
+<span class="line">    }</span>
+<span class="line"></span>
+<span class="line">    context := context + result</span>
+<span class="line">}</span></pre>
+            <div style="display:flex;flex-direction:column;justify-content:center;gap:10px">
+              <div class="code-desc" style="text-decoration: line-through; opacity: 0.6;">In large loops we can get
+                context rot</div>
+              <div class="code-desc" style="font-weight: 700;">But wait, Gemini has 1 million token context window</div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 14: Performance by input length -->
+    <section class="slide" id="slide-14">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content" style="padding: 0;">
+          <h2 class="slide-header"
+            style="position: absolute; left: 24.75px; top: 15.5px; font-size: 18px; font-weight: 400; color: #ffffff; margin: 0;">
+            Performance by input length</h2>
+          <img src="assets/slide_14_chart.jpeg"
+            style="position: absolute; left: 113.51px; top: 49.18px; width: 457.32px; height: 302.79px; border-radius: 2px;"
+            alt="Context rot chart">
+          <a href="https://trychroma.com/research/context-rot" target="_blank"
+            style="position: absolute; left: 24.75px; top: 352.17px; color: #ffffff; font-family: Arial, sans-serif; font-size: 8px; text-decoration: none;">trychroma.com/research/context-rot</a>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+
+    <!-- SLIDES 16-18: Making agents more powerful (diagram builds) -->
+    <section class="slide" id="slide-16">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Making agents more powerful<span class="sub">non-exhaustive list</span></h2>
+        </div>
+        <div class="diagram">
+          <div class="node-label" style="left:205.44px;top:182.11px">User</div>
+          <div class="node" style="left:295.94px;top:156.5px">Agent</div>
+          <div class="node" style="left:435.18px;top:156.5px">LLM</div>
+          <div class="tools-stack">
+            <div class="tools-card" style="left:309.31px;top:244.83px"></div>
+            <div class="tools-card" style="left:301.91px;top:252.69px"></div>
+            <div class="tools-card" style="left:293.44px;top:260.86px">Tools</div>
+          </div>
+          <svg width="720" height="405" style="position:absolute;inset:0;pointer-events:none">
+            <line x1="243.78" y1="189.78" x2="293.37" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <line x1="390.68" y1="189.78" x2="432.62" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <line x1="342.03" y1="225.63" x2="342.07" y2="242.27" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+          </svg>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-17">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Making agents more powerful<span class="sub">non-exhaustive list</span></h2>
+        </div>
+        <div class="diagram">
+          <div class="node-label" style="left:205.44px;top:182.11px">User</div>
+          <div class="node" style="left:295.94px;top:156.5px">Agent</div>
+          <div class="node" style="left:435.18px;top:156.5px">LLM</div>
+          <div class="tools-stack">
+            <div class="tools-card" style="left:309.31px;top:244.83px"></div>
+            <div class="tools-card" style="left:301.91px;top:252.69px"></div>
+            <div class="tools-card" style="left:293.44px;top:260.86px">Tools</div>
+          </div>
+          <div class="node-label" style="left:356.58px;top:124.01px;font-size:12px;font-weight:700;color:#7dcfff">
+            Enhancing the context</div>
+          <svg width="720" height="405" style="position:absolute;inset:0;pointer-events:none">
+            <line x1="243.78" y1="189.78" x2="293.37" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <line x1="390.68" y1="189.78" x2="432.62" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <line x1="342.03" y1="225.63" x2="342.07" y2="242.27" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <!-- Arrow pointing to connection -->
+            <line x1="413.4" y1="145.13" x2="404.66" y2="180.83" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-end="url(#arrow)" />
+          </svg>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-18">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Making agents more powerful<span class="sub">non-exhaustive list</span></h2>
+        </div>
+        <div class="diagram">
+          <div class="node-label" style="left:205.44px;top:182.11px">User</div>
+          <div class="node" style="left:295.94px;top:156.5px">Agent</div>
+          <div class="node" style="left:435.18px;top:156.5px">LLM</div>
+          <div class="tools-stack">
+            <div class="tools-card" style="left:309.31px;top:244.83px"></div>
+            <div class="tools-card" style="left:301.91px;top:252.69px"></div>
+            <div class="tools-card" style="left:293.44px;top:260.86px">Tools</div>
+          </div>
+          <div class="node-label" style="left:356.58px;top:124.01px;font-size:12px;font-weight:700;color:#7dcfff">
+            Enhancing the context</div>
+          <div class="node-label" style="left:415.83px;top:265.84px;font-size:12px;font-weight:700;color:#e0af68">
+            Providing tools</div>
+          <svg width="720" height="405" style="position:absolute;inset:0;pointer-events:none">
+            <line x1="243.78" y1="189.78" x2="293.37" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <line x1="390.68" y1="189.78" x2="432.62" y2="189.78" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <line x1="342.03" y1="225.63" x2="342.07" y2="242.27" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <!-- Arrows pointing to connections -->
+            <line x1="413.4" y1="145.13" x2="404.66" y2="180.83" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-end="url(#arrow)" />
+            <line x1="409.63" y1="272.93" x2="382.57" y2="269.95" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
+              marker-end="url(#arrow)" />
+          </svg>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 19: Making agents more powerful (topic boxes) -->
+    <section class="slide" id="slide-19">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content topics-layout">
+          <h2 class="slide-header">Making agents more powerful</h2>
+          <p class="topics-sub">…while avoiding context rot</p>
+          <div class="topics-grid">
+            <div class="topic-box">CLI vs MCP</div>
+            <div class="topic-box">Useful skills</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 20: CLI vs MCP -->
+    <section class="slide left-margin-31-7" id="slide-20">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">CLI vs MCP</h2>
+          <ul class="bullet-list">
+            <li><strong>Context preservation</strong> - no context bloat through JSON schemas</li>
+            <li><strong>Auth and permissions</strong> - leverage existing user credentials and SSO</li>
+            <li><strong>Zero infra overhead</strong> - no local background child processes</li>
+            <li><strong>Human-in-the-loop debugging</strong> - easy to debug since they run in user context and are
+              simple binaries</li>
+          </ul>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 21: CLIs ❤️ Skills -->
+    <section class="slide" id="slide-21">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content center-statement">
+          <div class="big-text">CLIs <span class="heart">❤️</span> Skills</div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 22: Agent skills -->
+    <section class="slide" id="slide-22">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content center-statement" style="padding: 0 40px;">
+          <h2 class="slide-header" style="margin: 0 0 16px 0; font-size: 34px; color: var(--gray-95);">Agent skills</h2>
+          <p
+            style="font-size: 26px; font-weight: 400; color: var(--white); line-height: 1.4; max-width: 600px; margin: 0 auto; letter-spacing: -0.01em;">
+            Specific procedural instructions for the agent how to do a task
+          </p>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDES 23-24: How skills work? -->
+    <section class="slide" id="slide-23">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">How do skills work?</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line hl">skills := get_available_skills()</span>
+<span class="line hl">response := ask_llm_for_skills(skills, context)</span>
+<span class="line hl">if response.skills {</span>
+<span class="line">    result := read_skills(response.skills)</span>
+<span class="line">}</span>
+<span class="line">context := context + result</span></pre>
+            <div class="code-desc">Reads the frontmatter of the available skills and based on name and description asks
+              the LLM to pick relevant skills given the current task</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <section class="slide" id="slide-24">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content code-layout">
+          <h2 class="slide-header">How skills work?</h2>
+          <div class="code-body">
+            <pre class="code-block"><span class="line">skills := get_available_skills()</span>
+<span class="line">response := ask_llm_for_skills(skills, context)</span>
+<span class="line">if response.skills {</span>
+<span class="line hl">    result := read_skills(response.skills)</span>
+<span class="line hl">}</span>
+<span class="line hl">context := context + result</span></pre>
+            <div class="code-desc">Reads the skills and adds them to the context</div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 25: Most common anti-pattern -->
+    <section class="slide" id="slide-25">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <img src="assets/slide_25_vite.jpeg"
+          style="position: absolute; left: 3.83px; top: 0px; width: 714.08px; height: 405px; z-index: 1; object-fit: fill;"
+          alt="">
+      </template>
+    </section>
+
+    <!-- SLIDE 26: Most common anti-pattern + DON'T -->
+    <section class="slide" id="slide-26">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <img src="assets/slide_25_vite.jpeg"
+          style="position: absolute; left: 3.83px; top: 0px; width: 714.08px; height: 405px; z-index: 1; object-fit: fill;"
+          alt="">
+        <div class="dont-overlay">
+          <div class="dont-circle"></div>
+          <div class="dont-text">DON'T</div>
+        </div>
+      </template>
+    </section>
+
+    <!-- SLIDE 27: Statement -->
+    <section class="slide" id="slide-27">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content statement-layout">
+          <p class="statement-text">Skills are unnecessary if the agent already possesses the capability</p>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 28: Five Best Practices -->
+    <section class="slide" id="slide-28">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .slide-content {
+            padding: 0;
+          }
+
+          .slide-header {
+            position: absolute;
+            left: 45px;
+            top: 32.86px;
+            font-size: 24px;
+            margin: 0;
+            white-space: nowrap;
+          }
+        </style>
+        <div class="slide-content">
+          <h2 class="slide-header"><span class="underline">Five</span> Best Practices for Agent Skills</h2>
+          <div class="practice-row r1"><span class="practice-num">01</span><span>Procedural instructions</span></div>
+          <div class="practice-row r2"><span class="practice-num">02</span><span>Frontmatter optimization</span></div>
+          <div class="practice-row r3"><span class="practice-num">03</span><span>Progressive disclosure</span></div>
+          <div class="practice-row r4"><span class="practice-num">04</span><span>Repetitive task scripting</span></div>
+          <div class="practice-row r5"><span class="practice-num">05</span><span>Skill composition</span></div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 28-1: Procedural instructions -->
+    <section class="slide" id="slide-28-1">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+            height: 235px;
+          }
+
+          .card {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 9.5px;
+            line-height: 1.35;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .badge {
+            position: absolute;
+            top: -8px;
+            right: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 8px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+          }
+
+          .badge.bad {
+            background: rgba(247, 118, 142, 0.15);
+            color: var(--red);
+            border: 1px solid var(--red);
+          }
+
+          .badge.good {
+            background: rgba(158, 206, 106, 0.15);
+            color: var(--green);
+            border: 1px solid var(--green);
+          }
+
+          .card-header {
+            font-weight: bold;
+            color: var(--blue);
+            margin-bottom: 8px;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 4px;
+          }
+        </style>
+        <div class="slide-content" style="padding: 25px 25px;">
+          <h2 class="slide-header" style="margin: 0 0 10px 0; font-size: 20px;">01. Procedural Instructions</h2>
+          <div class="compare-grid">
+            <div class="card">
+              <span class="badge bad">Narrative (Ambiguous)</span>
+              <div>
+                <div class="card-header">Conversational Phrasing</div>
+                <p style="color: var(--gray-60); margin: 0 0 8px 0;">"To run tests, first check if npm is installed. You
+                  can look for package.json. If yarn is used, run yarn. If npm is used, run npm. It is generally better
+                  to run npm ci to make sure dependencies match."</p>
+              </div>
+              <div style="font-style: italic; color: var(--red); margin-top: 6px;">Result: High failure rate due to
+                parser ambiguity.</div>
+            </div>
+            <div class="card">
+              <span class="badge good">Procedural (Deterministic)</span>
+              <div>
+                <div class="card-header">Ordered Steps</div>
+                <div class="mono" style="color: var(--white); line-height: 1.4;">
+                  1. Search for package.json files.<br>
+                  2. If yarn.lock is present, execute:<br>
+                  <span style="color:var(--blue)">yarn install --frozen-lockfile</span><br>
+                  3. If only package.json is present, execute:<br>
+                  <span style="color:var(--blue)">npm ci</span><br>
+                  4. Execute: <span style="color:var(--blue)">npm test</span>
+                </div>
+              </div>
+              <div style="font-style: italic; color: var(--green); margin-top: 6px;">Result: Predictable and repeatable
+                execution.</div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 28-2: Frontmatter optimization -->
+    <section class="slide" id="slide-28-2">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .agent-search {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+            height: 235px;
+          }
+
+          .search-input {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--gray-40);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-family: var(--mono);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+          }
+
+          .grid-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+          }
+
+          .match-card {
+            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .match-card.bad {
+            background: rgba(247, 118, 142, 0.03);
+            border-color: rgba(247, 118, 142, 0.15);
+          }
+
+          .match-card.good {
+            background: rgba(158, 206, 106, 0.03);
+            border-color: rgba(158, 206, 106, 0.15);
+          }
+
+          .stamp {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            border: 1.5px solid;
+            padding: 2px 6px;
+            border-radius: 3px;
+            transform: rotate(5deg);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+
+          .stamp.bad {
+            color: var(--red);
+            border-color: var(--red);
+          }
+
+          .stamp.good {
+            color: var(--green);
+            border-color: var(--green);
+          }
+        </style>
+        <div class="slide-content" style="padding: 25px 25px;">
+          <h2 class="slide-header" style="margin: 0 0 5px 0; font-size: 20px;">02. Frontmatter Optimization</h2>
+          <div class="agent-search">
+            <div class="search-input">
+              <span style="color:var(--gray-60)">Target Query:</span> "Run unit tests for my Angular app"
+            </div>
+            <div class="grid-compare">
+              <div class="match-card bad">
+                <span class="stamp bad">Not Selected</span>
+                <div>
+                  <div
+                    style="font-weight:bold; color:var(--red); font-size: 10.5px; margin-bottom:4px; font-family:var(--mono);">
+                    name: test-runner</div>
+                  <div style="color:var(--gray-60); font-size: 9.5px; font-family:var(--mono); line-height:1.3;">
+                    description: Runs repository tests.</div>
+                </div>
+                <div style="font-size:8.5px; color:var(--gray-60);">Ambiguous name and no technological constraints.
+                </div>
+              </div>
+              <div class="match-card good">
+                <span class="stamp good">Selected</span>
+                <div>
+                  <div
+                    style="font-weight:bold; color:var(--green); font-size: 10.5px; margin-bottom:4px; font-family:var(--mono);">
+                    name: angular-testing</div>
+                  <div style="color:var(--white); font-size: 9.5px; font-family:var(--mono); line-height: 1.3;">
+                    description: Runs Angular unit tests using Karma. Do not use for React or Vue.</div>
+                </div>
+                <div style="font-size:8.5px; color:var(--gray-60);">Explicit name, explicit framework, and negative
+                  triggers.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 28-3: Progressive disclosure -->
+    <section class="slide" id="slide-28-3">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .diet-grid {
+            display: grid;
+            grid-template-columns: 4.5fr 4.5fr;
+            gap: 15px;
+            margin-top: 15px;
+          }
+
+          .weight-scale {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 9.5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            height: 230px;
+          }
+
+          .scale-item {
+            border-radius: 4px;
+            padding: 8px;
+            border: 1px solid;
+          }
+
+          .scale-item.heavy {
+            background: rgba(247, 118, 142, 0.05);
+            border-color: rgba(247, 118, 142, 0.2);
+            color: var(--white);
+          }
+
+          .scale-item.lean {
+            background: rgba(158, 206, 106, 0.05);
+            border-color: rgba(158, 206, 106, 0.2);
+            color: var(--white);
+          }
+
+          .file-tree {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--gray-40);
+            border-radius: 6px;
+            padding: 12px;
+            font-family: var(--mono);
+            font-size: 9.5px;
+            line-height: 1.45;
+            color: var(--white);
+            height: 230px;
+          }
+
+          .folder {
+            color: var(--yellow);
+            font-weight: bold;
+          }
+
+          .file {
+            color: var(--blue);
+          }
+
+          .comment {
+            color: var(--gray-60);
+          }
+        </style>
+        <div class="slide-content" style="padding: 25px 25px;">
+          <h2 class="slide-header" style="margin: 0 0 10px 0; font-size: 20px;">03. Progressive Disclosure</h2>
+          <div class="diet-grid">
+            <div class="file-tree">
+              <span class="folder">angular-testing/</span><br>
+              <span>├── </span><span class="file">SKILL.md</span><span class="comment"> # Plan under 500
+                lines</span><br>
+              <span>├── </span><span class="folder">scripts/</span><span class="comment"> # Execution scripts</span><br>
+              <span>│ └── </span><span class="file">run-karma.sh</span><br>
+              <span>├── </span><span class="folder">references/</span><span class="comment"> # Static configuration
+                details</span><br>
+              <span>│ └── </span><span class="file">test-configs.md</span><br>
+              <span>└── </span><span class="folder">assets/</span><span class="comment"> # Structured templates</span>
+            </div>
+            <div class="weight-scale">
+              <div class="scale-item heavy">
+                <strong style="color:var(--red)">Monolithic Context (1,500+ lines)</strong>
+                <p style="margin: 4px 0 0 0; font-size: 9px; line-height: 1.35; color: var(--gray-95);">Increases
+                  latency and execution cost. High risk of key instruction dilution inside the LLM context window.</p>
+              </div>
+              <div class="scale-item lean">
+                <strong style="color:var(--green)">Lean Core Context (&lt;500 lines)</strong>
+                <p style="margin: 4px 0 0 0; font-size: 9px; line-height: 1.35; color: var(--gray-95);">Maintains rapid
+                  response times and accuracy. Dynamic reference loading is deferred until explicitly needed.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 28-4: Repetitive task scripting -->
+    <section class="slide" id="slide-28-4">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .script-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+            height: 230px;
+          }
+
+          .panel {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 9px;
+            line-height: 1.35;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .panel-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 10.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+
+          .panel-body {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 4px;
+            padding: 8px;
+            font-family: var(--mono);
+          }
+        </style>
+        <div class="slide-content" style="padding: 25px 25px;">
+          <h2 class="slide-header" style="margin: 0 0 10px 0; font-size: 20px;">04. Repetitive Task Scripting</h2>
+          <div class="script-grid">
+            <div class="panel">
+              <div class="panel-header" style="color: var(--red);">Manual Multi-Step Command Sequence</div>
+              <div class="panel-body" style="color: var(--gray-60); line-height: 1.45;">
+                <span style="color: var(--blue); font-weight: bold;"># SKILL.md</span><br>
+                To run the migration:<br>
+                1. Search: <span style="color: var(--cyan);">grep -rl "Karma" ./src</span><br>
+                2. Replace: <span style="color: var(--cyan);">sed -i 's/Karma/Jest/g' ./config</span><br>
+                3. Set env: <span style="color: var(--cyan);">export TEST_ENV=prod</span><br>
+                4. Verify: <span style="color: var(--cyan);">node ./scripts/build-check.js</span>
+              </div>
+              <p style="margin: 6px 0 0 0; color: var(--gray-60); font-size: 8.5px;">Listing manual commands inside the
+                skill file increases parser mistakes and points of failure.</p>
+            </div>
+            <div class="panel">
+              <div class="panel-header" style="color: var(--green);">Single-Command Executable Wrapper</div>
+              <div class="panel-body" style="color: var(--white); line-height: 1.45;">
+                <span style="color: var(--blue); font-weight: bold;"># SKILL.md</span><br>
+                To run the migration, execute the wrapper script:<br>
+                <span style="color: var(--green);">./scripts/migrate-tests.sh --env=prod</span>
+              </div>
+              <p style="margin: 6px 0 0 0; color: var(--gray-60); font-size: 8.5px;">Wrapping the multi-step sequence in
+                a modular script guarantees reliable and atomic execution.</p>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 28-5: Skill composition -->
+    <section class="slide" id="slide-28-5">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .composite-grid {
+            display: grid;
+            grid-template-columns: 5fr 4fr;
+            gap: 15px;
+            margin-top: 15px;
+          }
+
+          .diagram-box {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 12px;
+            height: 230px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+          }
+
+          .node {
+            border-radius: 4px;
+            padding: 8px 12px;
+            text-align: center;
+            font-weight: bold;
+            font-family: var(--mono);
+            font-size: 10px;
+          }
+
+          .node.router {
+            background: #282f45;
+            color: var(--blue);
+            border: 1px solid var(--blue);
+            margin-bottom: 35px;
+          }
+
+          .node.child {
+            background: #322e45;
+            color: var(--purple);
+            border: 1px solid var(--purple);
+          }
+
+          .arrow-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+          }
+
+          .bullets {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 230px;
+            font-size: 10.5px;
+            line-height: 1.45;
+            color: var(--white);
+          }
+        </style>
+        <div class="slide-content" style="padding: 25px 25px;">
+          <h2 class="slide-header" style="margin: 0 0 10px 0; font-size: 20px;">05. Skill Composition</h2>
+          <div class="composite-grid">
+            <div class="diagram-box">
+              <svg class="arrow-svg">
+                <line x1="50%" y1="38%" x2="28%" y2="65%" stroke="var(--gray-60)" stroke-width="1.5"
+                  stroke-dasharray="3,3" />
+                <line x1="50%" y1="38%" x2="72%" y2="65%" stroke="var(--gray-60)" stroke-width="1.5"
+                  stroke-dasharray="3,3" />
+              </svg>
+              <div class="node router" style="z-index: 2;">Router: build-project</div>
+              <div style="display: flex; gap: 30px; width: 100%; justify-content: space-around; z-index: 2;">
+                <div class="node child">client-build</div>
+                <div class="node child">server-build</div>
+              </div>
+            </div>
+            <div class="bullets">
+              Compose complex capabilities by nesting or conditionally routing to sub-skills:
+              <ul style="margin-top: 8px; padding-left: 15px; list-style-type: disc;">
+                <li style="margin-bottom: 8px;">Use high-level entry points to conditionally trigger targeted
+                  sub-skills.</li>
+                <li style="margin-bottom: 8px;">Allows clean routing paths instead of consolidating all logic in one
+                  document.</li>
+                <li>Keeps individual skills focused, modular, and easy to maintain.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 29: Skills versus scripts -->
+    <section class="slide" id="slide-29">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .terminal-body:not(.mono) {
+            font-size: 9.5px;
+            line-height: 1.35;
+            padding: 8px 12px;
+            white-space: normal;
+          }
+
+          .terminal-window .terminal-body .numbered-item {
+            margin-bottom: 6px;
+          }
+        </style>
+        <div class="slide-content">
+          <h2 class="slide-header" style="position: absolute; left: 31.71px; top: 41.18px; margin: 0;">Skills versus
+            scripts</h2>
+          <div class="terminal-window"
+            style="position: absolute; left: 31.71px; top: 116.23px; width: 259.49px; height: 207.07px;">
+            <div class="terminal-dots">
+              <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+            </div>
+            <div class="terminal-body" style="padding-top: 11px;">
+              <div class="numbered-item">1. Logs into Salesforce partner portal.</div>
+              <div class="numbered-item">2. Navigates to 'Q2 Dashboard'.</div>
+              <div class="numbered-item">3. Selects 'Export as CSV' from menu.</div>
+              <div class="numbered-item">4. Opens download folder and finds file.</div>
+              <div class="numbered-item" style="margin-bottom: 0;">5. Attaches CSV to a drafts folder email.</div>
+            </div>
+          </div>
+          <div class="terminal-window"
+            style="position: absolute; left: 349.06px; top: 116.23px; width: 259.49px; height: 207.07px;">
+            <div class="terminal-dots">
+              <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+            </div>
+            <div class="terminal-body mono"
+              style="padding-top: 18.48px; font-size: 9px; line-height: 1.25; white-space: pre;">res <span
+                class="py-op">=</span> requests.get(<span class="py-str">"..."</span>)
+              <span class="py-kw">with</span> <span class="py-fn">open</span>(<span class="py-str">"q2.csv"</span>,
+              <span class="py-str">"w"</span>) <span class="py-kw">as</span> f:
+              f.write(res.text)
+
+              msg <span class="py-op">=</span> EmailMessage()
+              msg[<span class="py-str">"Subject"</span>] <span class="py-op">=</span> <span class="py-str">"Q2
+                Report"</span>
+              msg.add_attachment(
+              <span class="py-fn">open</span>(<span class="py-str">"q2.csv"</span>, <span
+                class="py-str">"rb"</span>).read(),
+              maintype<span class="py-op">=</span><span class="py-str">"text"</span>,
+              subtype<span class="py-op">=</span><span class="py-str">"csv"</span>,
+              filename<span class="py-op">=</span><span class="py-str">"q2.csv"</span>
+              )
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 30: Testing skills -->
+    <section class="slide left-margin-31-7" id="slide-30">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Testing skills</h2>
+          <ul class="bullet-list" style="margin-top:40px">
+            <li>Ensures a skill is useful</li>
+            <li>Prevent regression</li>
+            <li>Removal of unused skills</li>
+            <li>Hill-climbing</li>
+          </ul>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 31: Agentic testing pyramid -->
+    <section class="slide" id="slide-31">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content pyramid-layout">
+          <h2 class="slide-header">Agentic testing pyramid</h2>
+          <div class="pyramid-container">
+            <svg width="720" height="405" style="position:absolute;inset:0">
+              <polygon class="pyramid-tier" points="208.65,356.42 508.57,356.42 448.59,254.98 268.63,254.98"
+                fill="#1e2030" stroke="rgba(255,255,255,0.12)" stroke-width="0.68" />
+              <polygon class="pyramid-tier" points="270.45,247.64 445.96,247.64 410.85,185.16 305.55,185.16"
+                fill="#1e2030" stroke="rgba(255,255,255,0.12)" stroke-width="0.68" />
+              <polygon class="pyramid-tier" points="308.35,178.2 359.02,90.62 409.69,178.2" fill="#1e2030"
+                stroke="rgba(255,255,255,0.12)" stroke-width="0.68" />
+            </svg>
+            <div class="pyramid-label"
+              style="left: 280px; top: 132px; width: 160px; line-height: 1.15; font-size: 9px !important;">
+              Agent<br>compositions
+              <span class="tier-sub" style="margin-top: 2px; font-size: 5px;">(e2e tests)</span>
+            </div>
+            <div class="pyramid-label"
+              style="left: 200px; top: 196px; width: 320px; line-height: 1.15; font-size: 9px !important;">
+              Agents<br>(composition of<br>skills &amp; CLIs)
+              <span class="tier-sub" style="margin-top: 3px; font-size: 5px;">(integration tests)</span>
+            </div>
+            <div class="pyramid-label" style="left: 280px; top: 298.48px; width: 160px;">
+              Skill evals
+              <span class="tier-sub" style="margin-top: 2px;">(unit tests)</span>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 32: Agentic testing pyramid (highlighted) -->
+    <section class="slide" id="slide-32">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content pyramid-layout">
+          <h2 class="slide-header">Agentic testing pyramid</h2>
+          <div class="pyramid-container has-active">
+            <svg width="720" height="405" style="position:absolute;inset:0">
+              <polygon class="pyramid-tier active" points="208.65,356.42 508.57,356.42 448.59,254.98 268.63,254.98"
+                fill="rgba(122,162,247,0.18)" stroke="#7aa2f7" stroke-width="0.68" />
+              <polygon class="pyramid-tier" points="270.45,247.64 445.96,247.64 410.85,185.16 305.55,185.16"
+                fill="#1e2030" stroke="rgba(255,255,255,0.12)" stroke-width="0.68" />
+              <polygon class="pyramid-tier" points="308.35,178.2 359.02,90.62 409.69,178.2" fill="#1e2030"
+                stroke="rgba(255,255,255,0.12)" stroke-width="0.68" />
+            </svg>
+            <div class="pyramid-label"
+              style="left: 280px; top: 132px; width: 160px; line-height: 1.15; font-size: 9px !important;">
+              Agent<br>compositions
+              <span class="tier-sub" style="margin-top: 2px; font-size: 5px;">(e2e tests)</span>
+            </div>
+            <div class="pyramid-label"
+              style="left: 200px; top: 196px; width: 320px; line-height: 1.15; font-size: 9px !important;">
+              Agents<br>(composition of<br>skills &amp; CLIs)
+              <span class="tier-sub" style="margin-top: 3px; font-size: 5px;">(integration tests)</span>
+            </div>
+            <div class="pyramid-label active" style="left: 280px; top: 298.48px; width: 160px;">
+              Skill evals
+              <span class="tier-sub" style="margin-top: 2px;">(unit tests)</span>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 33: Eval screenshot -->
+    <section class="slide" id="slide-33">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content img-layout">
+          <img src="assets/slide_33_eval.jpeg" class="placed-img" style="left:28px;top:26px;width:394px;height:272px"
+            alt="">
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 34: Eval screenshots overlapping -->
+    <section class="slide" id="slide-34">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content img-layout">
+          <img src="assets/slide_34_eval1.jpeg" class="placed-img" style="left:28px;top:26px;width:394px;height:272px"
+            alt="">
+          <img src="assets/slide_34_eval2.jpeg" class="placed-img" style="left:232px;top:40px;width:452px;height:308px"
+            alt="">
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 35: Skill evals details -->
+    <section class="slide left-margin-31-7" id="slide-35">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .bullet-list>li {
+            font-size: 14px;
+            line-height: 1.25;
+            margin-bottom: 6px;
+          }
+
+          .bullet-list .sub-list li {
+            font-size: 13px;
+            line-height: 1.25;
+            margin-bottom: 4px;
+          }
+
+          .bullet-list .sub-list {
+            margin-top: 4px;
+          }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Skill evals</h2>
+          <ul class="bullet-list">
+            <li><strong>Identify goals</strong> - based on your skills identify goals for your agent</li>
+            <li><strong>Create tasks</strong> - provide "assignments" with context to achieve the goals</li>
+            <li><strong>Run trials</strong> - run 5-30 executions of the workflow</li>
+            <li><strong>Grade</strong>
+              <ul class="sub-list">
+                <li><strong>Script grader</strong> - code evaluates the "state of the world"</li>
+                <li><strong>LLM grader</strong> - model grades the "trajectory"</li>
+                <li><strong>Human grader</strong> - looks at the output (we'll ignore this for now)</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 35-1: skillgrade brand transition -->
+    <section class="slide" id="slide-35-1">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .brand-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            padding-bottom: 37px;
+          }
+
+          .brand-text {
+            font-family: var(--font);
+            font-size: 56px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: var(--white);
+            text-transform: lowercase;
+          }
+        </style>
+        <div class="brand-container">
+          <div class="brand-text">skillgrade</div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 36: How to create evals? -->
+    <section class="slide" id="slide-36">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content">
+          <h2 class="slide-header" style="position: absolute; left: 31.71px; top: 41.18px; margin: 0;">How to create
+            evals?</h2>
+          <div class="terminal-window"
+            style="position: absolute; left: 31.71px; top: 116.23px; width: 345.9px; height: 207.07px;">
+            <div class="terminal-dots">
+              <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+            </div>
+            <div class="terminal-body s36-terminal"
+              style="padding-top: 18px; line-height: 29px; white-space: pre-wrap;"><span class="prompt">$</span> pnpm i
+              -g skillgrade
+              <span class="prompt">$</span> cd ~/skill-directory
+              <span class="prompt">$</span> skillgrade init
+              <span class="prompt">$</span> skillgrade
+            </div>
+          </div>
+          <ul class="bullet-list" style="position: absolute; left: 430.94px; top: 156.18px; margin: 0; padding: 0;">
+            <li>Provide API key as env var</li>
+            <li>Skillgrade will autogen evals</li>
+            <li>Run and report results</li>
+          </ul>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 37: Evals terminology -->
+    <section class="slide" id="slide-37">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content terms-layout">
+          <h2 class="slide-header">Evals terminology</h2>
+          <div class="terms-grid">
+            <div class="term-block">
+              <div class="term-title">pass@k</div>
+              <div class="term-desc">likelihood that an agent gets at least one correct solution in k attempts.</div>
+            </div>
+            <div class="term-block">
+              <div class="term-title">pass^k</div>
+              <div class="term-desc">measures the probability that all k trials succeed</div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 38: Demo — skillgrade terminal animation -->
+    <section class="slide" id="slide-38">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <iframe class="slide-iframe" src="slide-38-demo.html" scrolling="no" title="skillgrade demo"></iframe>
+      </template>
+    </section>
+
+    <!-- SLIDE 39: Skill hill-climbing -->
+    <section class="slide" id="slide-39">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <iframe class="slide-iframe" src="slide-39-stages.html" scrolling="no" title="Skill hill-climbing"></iframe>
+      </template>
+    </section>
+
+    <!-- SLIDE 40: Thank you! -->
+    <section class="slide" id="slide-40">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .thankyou-layout {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100%;
+            padding-left: 45px;
+            gap: 16px;
+          }
+
+          .thankyou-text {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--white) 30%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+          }
+
+          .contact-links {
+            display: flex;
+            gap: 16px;
+            margin-top: 4px;
+          }
+
+          .link-item {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            color: var(--gray-95);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 5px 10px;
+            border-radius: 6px;
+            background: rgba(30, 32, 48, 0.4);
+          }
+        </style>
+        <div class="slide-content thankyou-layout">
+          <h2 class="thankyou-text">Thank you!</h2>
+          <div class="contact-links">
+            <div class="link-item"><span class="icon">🐙</span><span>github.com/mgechev</span></div>
+            <div class="link-item"><span class="icon">🐦</span><span>@mgechev</span></div>
+            <div class="link-item"><span class="icon">🌐</span><span>blog.mgechev.com</span></div>
+          </div>
+        </div>
+      </template>
+    </section>
+
+  </main>
+
+  <!-- Shared SVG defs -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6"
+        orient="auto-start-reverse">
+        <path d="M 1 2.5 L 7 5 L 1 7.5 Z" fill="rgba(122,162,247,0.55)" />
+      </marker>
+    </defs>
+  </svg>
+
+  <!-- Navigation HUD -->
+  <nav class="presentation-hud">
+    <button class="hud-btn" id="prev-btn" aria-label="Previous slide">&#8592;</button>
+    <span class="hud-progress" id="progress-indicator">1 / 40</span>
+    <button class="hud-btn" id="next-btn" aria-label="Next slide">&#8594;</button>
+    <button class="hud-btn" id="fullscreen-btn" aria-label="Fullscreen">&#x26F6;</button>
+  </nav>
+  <div class="timeline-bar">
+    <div class="timeline-progress" id="progress-bar"></div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      // ── Syntax highlighting ──
+      const KW = /\b(while|if|true|false|break)\b/g;
+      const FN = /\b([a-z_]\w*)\s*(?=\()/g;
+      const OP = /(:=|\+)/g;
+      const STR = /("[^"]*")/g;
+
+      function esc(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+      function hi(raw) {
+        let s = esc(raw);
+        s = s.replace(STR, '<span style="color:#7dcfff">$1</span>');
+        s = s.replace(KW, '<span style="color:#e0af68">$1</span>');
+        s = s.replace(FN, '<span style="color:#7aa2f7">$1</span>');
+        s = s.replace(OP, '<span style="color:#565f89">$1</span>');
+        return s;
+      }
+      document.querySelectorAll('.slide').forEach(slide => {
+        const root = slide.shadowRoot || slide;
+        root.querySelectorAll('.code-block .line').forEach(el => {
+          el.innerHTML = hi(el.textContent);
+        });
+      });
+
+      // ── Align code-desc with highlighted lines (Shadow-piercing & Scale-aware) ──
+      function positionBodyDesc(body) {
+        const block = body.querySelector('.code-block');
+        if (!block) return;
+        let descEl = null;
+        for (const c of body.children) {
+          if (c !== block) { descEl = c; break; }
+        }
+        if (!descEl) return;
+
+        const hls = block.querySelectorAll('.line.hl');
+        if (!hls.length) {
+          descEl.style.alignSelf = 'center';
+          descEl.style.marginTop = '0';
+          return;
+        }
+
+        const bodyRect = body.getBoundingClientRect();
+        if (bodyRect.height === 0 || body.offsetHeight === 0) return;
+
+        // Scale factor is viewport height divided by offsetHeight (CSS layout pixels)
+        const scale = bodyRect.height / body.offsetHeight;
+
+        const firstRect = hls[0].getBoundingClientRect();
+        const lastRect = hls[hls.length - 1].getBoundingClientRect();
+
+        // Calculate vertical center of highlighted lines relative to body in viewport pixels
+        const hlCenterScaled = (firstRect.top + lastRect.bottom) / 2 - bodyRect.top;
+
+        // Convert to unscaled layout pixels
+        const hlCenter = hlCenterScaled / scale;
+
+        // Centering calculation in CSS layout pixels
+        const mt = Math.max(0, hlCenter - descEl.offsetHeight / 2);
+
+        descEl.style.alignSelf = 'start';
+        descEl.style.marginTop = mt + 'px';
+      }
+
+      // Observe resizing and visibility of all .code-body elements
+      const resizeObs = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          const body = entry.target;
+          if (body.offsetHeight > 0) {
+            positionBodyDesc(body);
+          }
+        }
+      });
+
+      document.querySelectorAll('.slide').forEach(slide => {
+        const root = slide.shadowRoot || slide;
+        root.querySelectorAll('.code-body').forEach(body => {
+          resizeObs.observe(body);
+        });
+      });
+
+      // Re-run alignment for active slide on window resize
+      window.addEventListener('resize', () => {
+        const active = document.querySelector('.slide.active');
+        if (!active) return;
+        const root = active.shadowRoot || active;
+        root.querySelectorAll('.code-body').forEach(body => {
+          if (body.offsetHeight > 0) {
+            positionBodyDesc(body);
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill hill-climbing</title>
+  <meta name="description" content="Interactive presentation slide showing the SkillGrade agent validation loop as a state machine.">
+  <link rel="stylesheet" href="five-stages-style.css">
+  <style>
+    /* Scale everything down to fit the 720×405 slide canvas */
+    html { font-size: 9px !important; }
+    html, body { width: 720px; height: 405px; overflow: hidden; }
+    body { padding: 0.75rem 1.3rem 0.4rem; }
+    .workspace { gap: 0.6rem; grid-template-columns: 1fr 31vw; }
+  </style>
+</head>
+<body>
+
+  <header class="slide-header">
+    <div class="header-container">
+      <div class="logo-section">
+        <h1 class="slide-title">
+          Skill hill-climbing
+        </h1>
+        <p class="slide-subtitle">Trajectory Optimization Loop</p>
+      </div>
+
+      <div class="presenter-toolbar">
+        <div class="preset-label" style="font-family: var(--font-mono); font-size: 0.5rem; font-weight: 500; color: var(--color-blue); background: rgba(122, 162, 247, 0.05); border: 1px solid rgba(122, 162, 247, 0.2); padding: 0.2rem 0.55rem; border-radius: 3px; display: inline-flex; align-items: center; letter-spacing: 0.02em; cursor: default;">
+          SQLite Query Validator
+        </div>
+        <select id="preset-selector" style="display: none;">
+          <option value="sqlite" selected>SQLite Query Validator</option>
+        </select>
+
+        <button id="btn-play-pause" class="btn" title="Play Loop">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" id="play-icon">
+            <polygon points="6 3 20 12 6 21 6 3"></polygon>
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13" id="pause-icon" style="display:none;">
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+          <span id="play-btn-text">Run</span>
+        </button>
+
+        <button id="btn-step" class="btn btn-secondary" title="Step Forward">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13">
+            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+            <line x1="19" y1="5" x2="19" y2="19"></line>
+          </svg>
+          <span>Step</span>
+        </button>
+
+        <button id="btn-reset" class="btn btn-secondary btn-icon" title="Reset">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+          </svg>
+        </button>
+
+        <div class="speed-control">
+          <span>Speed</span>
+          <input type="range" id="speed-slider" min="1" max="5" value="3" aria-label="Speed">
+          <span id="speed-val">1.0x</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="workspace">
+
+    <section class="canvas-panel">
+      <div class="canvas-panel-header">
+        <div class="canvas-panel-header-left">
+          <div class="dots">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+          <div class="canvas-panel-title">bash — skillgrade validate</div>
+        </div>
+        <div class="iter-indicator-pill iter-1" id="iter-indicator">
+          <span class="iter-dot"></span>
+          <span class="iter-label" id="iter-indicator-text">Iteration 1</span>
+        </div>
+      </div>
+
+      <div class="diagram-area-container">
+        <div class="diagram-area" id="diagram-canvas">
+
+          <svg class="svg-connectors" id="connectors-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="rgba(255,255,255,0.06)"/>
+              </marker>
+              <marker id="active-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#7aa2f7" id="arrow-color-fill"/>
+              </marker>
+            </defs>
+
+            <path id="edge-0" class="connection-edge" d="M 600,130 Q 760,80 830,400" marker-end="url(#arrow)" />
+            <path id="flow-0" class="edge-pulse"      d="M 600,130 Q 760,80 830,400" />
+
+            <path id="edge-1" class="connection-edge" d="M 860,470 Q 870,690 770,835" marker-end="url(#arrow)" />
+            <path id="flow-1" class="edge-pulse"      d="M 860,470 Q 870,690 770,835" />
+
+            <path id="edge-2" class="connection-edge" d="M 630,870 Q 500,950 370,870" marker-end="url(#arrow)" />
+            <path id="flow-2" class="edge-pulse"      d="M 630,870 Q 500,950 370,870" />
+
+            <path id="edge-3" class="connection-edge" d="M 230,835 Q 120,690 140,470" marker-end="url(#arrow)" />
+            <path id="flow-3" class="edge-pulse"      d="M 230,835 Q 120,690 140,470" />
+
+            <path id="edge-4" class="connection-edge" d="M 170,400 Q 240,80 400,130" marker-end="url(#arrow)" />
+            <path id="flow-4" class="edge-pulse"      d="M 170,400 Q 240,80 400,130" />
+          </svg>
+
+          <div class="state-node state-node-skill active-node" id="node-0" data-node="0">
+            <span class="node-step-num">1</span>
+            <span class="node-name">Skill Setup</span>
+          </div>
+
+          <div class="state-node state-node-agent inactive" id="node-1" data-node="1">
+            <span class="node-step-num">2</span>
+            <span class="node-name">Agent Executor</span>
+          </div>
+
+          <div class="state-node state-node-trajectory inactive" id="node-2" data-node="2">
+            <span class="node-step-num">3</span>
+            <span class="node-name">Trajectory Log</span>
+          </div>
+
+          <div class="state-node state-node-skillgrade inactive" id="node-3" data-node="3">
+            <span class="node-step-num">4</span>
+            <span class="node-name">SkillGrade Audit</span>
+          </div>
+
+          <div class="state-node state-node-optimizer inactive" id="node-4" data-node="4">
+            <span class="node-step-num">5</span>
+            <span class="node-name">Skill Optimizer</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="inspector-panel" id="inspector-card">
+      <div class="inspector-header">
+        <div class="inspector-header-left">
+          <div class="dots">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+          <span class="card-state-title" id="card-state-title">01. Skill Setup</span>
+        </div>
+        <div class="inspector-tabs">
+          <button class="inspector-tab-btn active tab-focused-now" id="tab-0" data-tab="0">Skill</button>
+          <button class="inspector-tab-btn" id="tab-1" data-tab="1">Agent</button>
+          <button class="inspector-tab-btn" id="tab-2" data-tab="2">Trace</button>
+          <button class="inspector-tab-btn" id="tab-3" data-tab="3">Audit</button>
+          <button class="inspector-tab-btn" id="tab-4" data-tab="4">Diff</button>
+        </div>
+      </div>
+
+      <div class="inspector-body">
+
+        <div class="inspector-section active-section" id="section-0">
+          <div class="skill-name-card" id="inspector-skill-name">sqlite_helper.json</div>
+          <div class="skill-editor-container">
+            <textarea id="guidelines-text" class="skill-editor" spellcheck="false" aria-label="System Guidelines"></textarea>
+          </div>
+        </div>
+
+        <div class="inspector-section" id="section-1">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Assignment</div>
+          <div id="inspector-task-desc" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: 0.35rem 0.45rem; border-radius: 3px; font-weight: 500; font-size: 0.78rem; line-height: 1.5; color: var(--text-secondary);">
+            Select scenario preset to load task.
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-top: 0.35rem;">Execution Console</div>
+          <div class="terminal-card">
+            <div class="terminal-card-header">
+              <div class="terminal-dots"><span></span><span></span><span></span></div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);" id="terminal-filename">agent_sandbox.sh</div>
+              <div style="width: 1.5rem;"></div>
+            </div>
+            <div class="terminal-card-body" id="terminal-agent-body">
+              <div class="terminal-prompt">
+                <span>$</span>
+                <span id="agent-active-typing"></span><span class="cursor"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-section" id="section-2">
+          <div class="terminal-card" style="height: 100%;">
+            <div class="terminal-card-header">
+              <div class="terminal-dots"><span></span><span></span><span></span></div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">trajectory_steps.jsonl</div>
+              <div style="width: 1.5rem;"></div>
+            </div>
+            <div class="terminal-card-body" id="terminal-trajectory-body">
+              <div style="color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-top: 2rem;">
+                No steps recorded.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-section" id="section-3">
+          <div class="scorecard-box">
+            <div class="scorecard-box-header">
+              <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Scorecard</span>
+              <span id="score-badge" class="badge">Pending</span>
+            </div>
+            <div class="scorecard-grid">
+              <div class="score-card-metric">
+                <span>Task Success</span>
+                <strong id="val-success">–</strong>
+              </div>
+              <div class="score-card-metric">
+                <span>Compliance</span>
+                <strong id="val-adherence">–</strong>
+              </div>
+              <div class="score-card-metric">
+                <span>Violations</span>
+                <strong id="val-violations">–</strong>
+              </div>
+              <div class="score-card-metric">
+                <span>Final Score</span>
+                <strong id="val-score">–</strong>
+              </div>
+            </div>
+          </div>
+          <div class="findings-list" id="findings-wrapper">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-align: center; padding: 1rem 0;">
+              Evaluation pending.
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector-section" id="section-4">
+          <div class="diff-card">
+            <div class="diff-card-header">Guidelines Patch Diff</div>
+            <div class="diff-card-body" id="diff-wrapper">
+              <div style="color: var(--text-muted); font-size: 0.75rem; text-align: center; margin-top: 3rem;">
+                No adjustments computed.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="slide-footer">
+    <span>• AI Coding Summit</span>
+    <span class="footer-center">■</span>
+    <span>2026</span>
+  </footer>
+
+  <script src="five-stages-app.js"></script>
+</body>
+</html>

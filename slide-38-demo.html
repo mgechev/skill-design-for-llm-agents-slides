@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>skillgrade · sqlite-ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  background: radial-gradient(ellipse at 50% 40%, #131720 0%, #0d1017 70%);
+  width: 720px;
+  height: 405px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+}
+
+.terminal {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(122, 162, 247, 0.15);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 20px 50px rgba(0,0,0,0.7),
+    0 4px 12px rgba(0,0,0,0.5),
+    0 0 40px rgba(122, 162, 247, 0.08);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.terminal:hover {
+  border-color: rgba(122, 162, 247, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 20px 50px rgba(0,0,0,0.75),
+    0 4px 12px rgba(0,0,0,0.5),
+    0 0 60px rgba(122, 162, 247, 0.18);
+}
+
+.titlebar {
+  background: #1e2030;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,0,0,0.4);
+  user-select: none;
+}
+
+.dots { display: flex; gap: 6px; align-items: center; }
+.dot  { width: 10px; height: 10px; border-radius: 50%; }
+.dot-r { background: #ff5f57; }
+.dot-y { background: #febc2e; }
+.dot-g { background: #28c840; }
+
+.titlebar-title {
+  flex: 1;
+  text-align: center;
+  font-size: 10px;
+  color: #3b3f5e;
+  padding-right: 32px;
+}
+
+.body {
+  background: #1a1b26;
+  padding: 14px 18px 20px;
+  font-size: 10.5px;
+  line-height: 1.65;
+  color: #a9b1d6;
+  height: 308px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  white-space: pre-wrap;
+}
+.body::-webkit-scrollbar { display: none; }
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.85em;
+  background: #a9b1d6;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.g { color: #9ece6a; }
+.r { color: #f7768e; }
+.y { color: #e0af68; }
+.b { color: #7aa2f7; }
+.c { color: #7dcfff; }
+.p { color: #bb9af7; }
+.d { color: #565f89; }
+.w { color: #c0caf5; }
+
+.btn {
+  display: none;
+  background: transparent;
+  border: 1px solid #1e2030;
+  color: #3b3f5e;
+  font-family: inherit;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: color .12s, border-color .12s;
+}
+.btn:hover { color: #7aa2f7; border-color: #7aa2f7; }
+</style>
+</head>
+<body>
+
+<div class="terminal">
+  <div class="titlebar">
+    <div class="dots">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+    </div>
+    <div class="titlebar-title">bash — ~/projects/sqlite-ops</div>
+  </div>
+  <div class="body" id="term"></div>
+</div>
+
+<button class="btn" onclick="restart()">↺  restart</button>
+
+<script>
+const T = document.getElementById('term');
+const SPIN = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'.split('');
+
+let alive = false;
+const timeouts = [], ivals = [];
+
+function stopAll() {
+  alive = false;
+  timeouts.forEach(clearTimeout); timeouts.length = 0;
+  ivals.forEach(clearInterval);   ivals.length = 0;
+}
+
+function sleep(ms) {
+  if (!alive) return Promise.reject('stop');
+  return new Promise((ok, fail) => {
+    const t = setTimeout(() => alive ? ok() : fail('stop'), ms);
+    timeouts.push(t);
+  });
+}
+
+function getCursor() {
+  let c = T.querySelector('.cursor');
+  if (!c) { c = document.createElement('span'); c.className = 'cursor'; T.appendChild(c); }
+  return c;
+}
+
+function dropCursor() { T.querySelector('.cursor')?.remove(); }
+function scroll()     { T.scrollTop = T.scrollHeight; }
+
+async function line(html, delay = 0) {
+  if (delay) await sleep(delay);
+  dropCursor();
+  const s = document.createElement('span');
+  s.innerHTML = html;
+  T.appendChild(s);
+  T.appendChild(document.createTextNode('\n'));
+  scroll();
+  getCursor();
+}
+
+const blank = (d = 60) => line('', d);
+
+async function type(text) {
+  dropCursor();
+  const row = document.createElement('span');
+  row.innerHTML = '<span class="g">❯</span> ';
+  T.appendChild(row);
+  const cmd = document.createElement('span');
+  cmd.style.color = '#c0caf5';
+  T.appendChild(cmd);
+  getCursor();
+  for (const ch of text) {
+    if (!alive) throw 'stop';
+    cmd.textContent += ch;
+    scroll();
+    await sleep(44 + Math.random() * 34);
+  }
+  await sleep(260);
+  dropCursor();
+  T.appendChild(document.createTextNode('\n'));
+}
+
+function spinner(prefix) {
+  dropCursor();
+  const el = document.createElement('span');
+  const nl = document.createTextNode('\n');
+  T.appendChild(el);
+  T.appendChild(nl);
+  let f = 0, s = 0, tick = 0;
+  const id = setInterval(() => {
+    tick++; f = (f + 1) % SPIN.length;
+    if (tick % 13 === 0) s++;
+    el.innerHTML = `<span class="y">${SPIN[f]}</span> ${prefix} <span class="d">${s}s</span>`;
+    scroll();
+  }, 80);
+  ivals.push(id);
+  return {
+    stop() {
+      clearInterval(id);
+      const i = ivals.indexOf(id); if (i !== -1) ivals.splice(i, 1);
+      el.remove(); nl.remove();
+    }
+  };
+}
+
+async function run() {
+  T.innerHTML = '';
+  getCursor();
+  await sleep(600);
+
+  await type('skillgrade init');
+  await blank(220);
+  await line('  Found 1 skill(s): <span class="c">sqlite-ops</span>', 260);
+  await blank(80);
+  { const sp = spinner('generating eval with Gemini'); await sleep(2300); sp.stop(); }
+  await line('  <span class="g">✓</span> created <span class="w">eval.yaml</span>', 80);
+  await line('    Review and edit the file, then run: <span class="d">skillgrade</span>', 100);
+  await blank(160);
+  await sleep(680);
+
+  await type('skillgrade --smoke');
+  await blank(170);
+  await line('  <span class="d">skill</span>          <span class="c">sqlite-ops</span>', 110);
+  await line('  <span class="d">env</span>            <span class="y">ANTHROPIC_API_KEY</span>', 75);
+  await line('  <span class="d">output</span>         /tmp/skillgrade/sqlite-ops', 75);
+  await blank(110);
+  await line('<span class="b">── create-user-schema ──────────────────────────────────────</span>', 230);
+  await line('    <span class="d">agent</span> <span class="p">claude</span>  <span class="d">provider</span> docker  <span class="d">trials</span> 5', 120);
+  await blank(120);
+  { const sp = spinner('    <span class="d">build</span>  building image'); await sleep(1700); sp.stop(); }
+  await line('    <span class="d">build</span>  <span class="g">✓</span> image ready');
+  await blank(100);
+
+  const TRIALS = [
+    { pass: true,  score: '0.95', dur: '4.2s', cmds: '3', det: '1.00', llm: '0.88', ms: 1500 },
+    { pass: true,  score: '0.87', dur: '3.8s', cmds: '4', det: '0.90', llm: '0.82', ms: 1280 },
+    { pass: false, score: '0.35', dur: '5.1s', cmds: '7', det: '0.50', llm: '0.20', ms: 1820 },
+    { pass: true,  score: '0.91', dur: '4.5s', cmds: '3', det: '1.00', llm: '0.76', ms: 1380 },
+    { pass: true,  score: '0.93', dur: '3.9s', cmds: '3', det: '0.95', llm: '0.89', ms: 1340 },
+  ];
+
+  for (let i = 0; i < TRIALS.length; i++) {
+    const t = TRIALS[i];
+    const n = `${i + 1}/5`;
+    const sp = spinner(`    <span class="d">${n}</span>  running agent`);
+    await sleep(t.ms);
+    sp.stop();
+    const verdict   = t.pass ? `<span class="g">✓ PASS</span>` : `<span class="r">✗ FAIL</span>`;
+    const scoreHtml = t.pass ? `<span class="g">${t.score}</span>` : `<span class="r">${t.score}</span>`;
+    await line(
+      `    <span class="d">${n}</span>    ${verdict}  ${scoreHtml}  ${t.dur}  ${t.cmds} cmds` +
+      `  <span class="d">deterministic</span> <span class="w">${t.det}</span>` +
+      `  <span class="d">llm_rubric</span> <span class="w">${t.llm}</span>`
+    );
+  }
+
+  await blank(200);
+  await line('    <span class="d">trial 3 llm_rubric:</span> Agent created the table but did not insert the required sample data…', 270);
+  await blank(170);
+  await line('<span class="b">── Results (smoke test) ─────────────────────────────────────</span>', 340);
+  await line('    <span class="d">Pass Rate</span>    <span class="g">80.0%</span>  <span class="y">◂</span>', 200);
+  await line('    <span class="d">pass@5</span>       <span class="w">99.7%</span>', 130);
+  await line('    <span class="d">pass^5</span>        <span class="w"> 0.4%</span>', 130);
+  await blank(160);
+
+  dropCursor();
+  await sleep(5500);
+  if (alive) run();
+}
+
+function restart() {
+  stopAll();
+  setTimeout(() => { alive = true; run().catch(() => {}); }, 80);
+}
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.start) {
+    stopAll();
+    T.innerHTML = '';
+    alive = true;
+    run().catch(() => {});
+  }
+});
+</script>
+
+</body>
+</html>
