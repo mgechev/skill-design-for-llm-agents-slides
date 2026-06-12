@@ -115,40 +115,25 @@
         <style>
           @import url('style.css');
 
-          @property --sweep-angle {
-            syntax: '<angle>';
-            inherits: false;
-            initial-value: -45deg;
-          }
-          @keyframes border-sweep {
-            from { --sweep-angle: -45deg; opacity: 0.9; }
-            80%  { opacity: 0.7; }
-            to   { --sweep-angle: 315deg; opacity: 0; }
-          }
-          .diagram .node, .diagram .tools-card { isolation: isolate; }
-          .diagram .node::before, .diagram .tools-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            padding: 1px;
-            border-radius: inherit;
-            box-sizing: border-box;
-            background: conic-gradient(
-              from var(--sweep-angle) at 50% 50%,
-              transparent 0%, rgba(122,162,247,.55) 12%,
-              rgba(122,162,247,.2) 22%, transparent 30%, transparent 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            pointer-events: none;
+          .chase-node, .chase-card {
+            fill: none;
+            stroke: rgba(122,162,247, 0.4);
+            stroke-width: 1.2;
+            stroke-linecap: round;
             opacity: 0;
           }
-          :host(.active) .diagram .node::before,
-          :host(.active) .diagram .tools-card::before {
-            animation: border-sweep 1.8s ease-out forwards;
+          @keyframes svg-chase-node {
+            0%   { stroke-dashoffset: 0;    opacity: 0.5; }
+            70%  { opacity: 0.3; }
+            100% { stroke-dashoffset: -312; opacity: 0; }
           }
+          @keyframes svg-chase-card {
+            0%   { stroke-dashoffset: 0;    opacity: 0.45; }
+            70%  { opacity: 0.25; }
+            100% { stroke-dashoffset: -232; opacity: 0; }
+          }
+          :host(.active) .chase-node { animation: svg-chase-node 1.8s ease-out forwards; }
+          :host(.active) .chase-card { animation: svg-chase-card 1.8s ease-out forwards; }
         </style>
         <div class="slide-content header-layout">
           <h2 class="slide-header">How agents work?</h2>
@@ -172,6 +157,9 @@
             <!-- Agent <-> Tools -->
             <line x1="342.03" y1="225.63" x2="342.07" y2="242.27" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
               marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <rect class="chase-node" x="295.94" y="156.5"  width="92.17" height="66.56" rx="3" stroke-dasharray="47 9999"/>
+            <rect class="chase-card" x="293.44" y="260.86" width="65.52" height="52.94" rx="3" stroke-dasharray="35 9999" style="animation-delay:0.1s"/>
+            <rect class="chase-node" x="435.18" y="156.5"  width="92.17" height="66.56" rx="3" stroke-dasharray="47 9999" style="animation-delay:0.22s"/>
           </svg>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
@@ -185,40 +173,25 @@
         <style>
           @import url('style.css');
 
-          @property --sweep-angle {
-            syntax: '<angle>';
-            inherits: false;
-            initial-value: -45deg;
-          }
-          @keyframes border-sweep {
-            from { --sweep-angle: -45deg; opacity: 0.9; }
-            80%  { opacity: 0.7; }
-            to   { --sweep-angle: 315deg; opacity: 0; }
-          }
-          .diagram .node, .diagram .tools-card { isolation: isolate; }
-          .diagram .node::before, .diagram .tools-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            padding: 1px;
-            border-radius: inherit;
-            box-sizing: border-box;
-            background: conic-gradient(
-              from var(--sweep-angle) at 50% 50%,
-              transparent 0%, rgba(122,162,247,.55) 12%,
-              rgba(122,162,247,.2) 22%, transparent 30%, transparent 100%
-            );
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            pointer-events: none;
+          .chase-node, .chase-card {
+            fill: none;
+            stroke: rgba(122,162,247, 0.4);
+            stroke-width: 1.2;
+            stroke-linecap: round;
             opacity: 0;
           }
-          :host(.active) .diagram .node::before,
-          :host(.active) .diagram .tools-card::before {
-            animation: border-sweep 1.8s ease-out forwards;
+          @keyframes svg-chase-node {
+            0%   { stroke-dashoffset: 0;    opacity: 0.5; }
+            70%  { opacity: 0.3; }
+            100% { stroke-dashoffset: -312; opacity: 0; }
           }
+          @keyframes svg-chase-card {
+            0%   { stroke-dashoffset: 0;    opacity: 0.45; }
+            70%  { opacity: 0.25; }
+            100% { stroke-dashoffset: -232; opacity: 0; }
+          }
+          :host(.active) .chase-node { animation: svg-chase-node 1.8s ease-out forwards; }
+          :host(.active) .chase-card { animation: svg-chase-card 1.8s ease-out forwards; }
         </style>
         <div class="slide-content header-layout">
           <h2 class="slide-header">How agents work?<span class="sub">Model Context Protocol</span></h2>
@@ -250,6 +223,10 @@
             <!-- Agent <-> MCP server -->
             <line x1="340.37" y1="217.32" x2="416.37" y2="261.19" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
               marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <rect class="chase-node" x="246.22" y="149.24" width="92.17" height="66.56" rx="3" stroke-dasharray="47 9999"/>
+            <rect class="chase-card" x="243.73" y="253.61" width="65.52" height="52.94" rx="3" stroke-dasharray="35 9999" style="animation-delay:0.1s"/>
+            <rect class="chase-node" x="419.82" y="263.11" width="92.17" height="66.56" rx="3" stroke-dasharray="47 9999" style="animation-delay:0.22s"/>
+            <rect class="chase-node" x="385.46" y="149.24" width="92.17" height="66.56" rx="3" stroke-dasharray="47 9999" style="animation-delay:0.35s"/>
           </svg>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
@@ -602,6 +579,26 @@
       <template shadowrootmode="open">
         <style>
           @import url('style.css');
+
+          .chase-node, .chase-card {
+            fill: none;
+            stroke: rgba(122,162,247, 0.4);
+            stroke-width: 1.2;
+            stroke-linecap: round;
+            opacity: 0;
+          }
+          @keyframes svg-chase-node {
+            0%   { stroke-dashoffset: 0;    opacity: 0.5; }
+            70%  { opacity: 0.3; }
+            100% { stroke-dashoffset: -312; opacity: 0; }
+          }
+          @keyframes svg-chase-card {
+            0%   { stroke-dashoffset: 0;    opacity: 0.45; }
+            70%  { opacity: 0.25; }
+            100% { stroke-dashoffset: -232; opacity: 0; }
+          }
+          :host(.active) .chase-node { animation: svg-chase-node 1.8s ease-out forwards; }
+          :host(.active) .chase-card { animation: svg-chase-card 1.8s ease-out forwards; }
         </style>
         <div class="slide-content header-layout">
           <h2 class="slide-header">Making agents more powerful<span class="sub">non-exhaustive list</span></h2>
@@ -622,6 +619,9 @@
               marker-start="url(#arrow)" marker-end="url(#arrow)" />
             <line x1="342.03" y1="225.63" x2="342.07" y2="242.27" stroke="rgba(122,162,247,0.4)" stroke-width="0.75"
               marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <rect class="chase-node" x="295.94" y="156.5"  width="92.17" height="66.56" rx="3" stroke-dasharray="47 9999"/>
+            <rect class="chase-card" x="293.44" y="260.86" width="65.52" height="52.94" rx="3" stroke-dasharray="35 9999" style="animation-delay:0.1s"/>
+            <rect class="chase-node" x="435.18" y="156.5"  width="92.17" height="66.56" rx="3" stroke-dasharray="47 9999" style="animation-delay:0.22s"/>
           </svg>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
@@ -710,13 +710,38 @@
       <template shadowrootmode="open">
         <style>
           @import url('style.css');
+
+          .topic-box { position: relative; }
+          .chase-tbox {
+            fill: none;
+            stroke: rgba(122,162,247, 0.4);
+            stroke-width: 1.2;
+            stroke-linecap: round;
+            opacity: 0;
+          }
+          @keyframes svg-chase-tbox {
+            0%   { stroke-dashoffset: 0;    opacity: 0.5; }
+            70%  { opacity: 0.3; }
+            100% { stroke-dashoffset: -733; opacity: 0; }
+          }
+          :host(.active) .chase-tbox { animation: svg-chase-tbox 2s ease-out forwards; }
         </style>
         <div class="slide-content topics-layout">
           <h2 class="slide-header">Making agents more powerful</h2>
           <p class="topics-sub">…while avoiding context rot</p>
           <div class="topics-grid">
-            <div class="topic-box">CLI vs MCP</div>
-            <div class="topic-box">Useful skills</div>
+            <div class="topic-box">
+              <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+                <rect class="chase-tbox" width="240" height="130" rx="4" stroke-dasharray="50 9999"/>
+              </svg>
+              CLI vs MCP
+            </div>
+            <div class="topic-box">
+              <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+                <rect class="chase-tbox" width="240" height="130" rx="4" stroke-dasharray="50 9999" style="animation-delay:0.25s"/>
+              </svg>
+              Useful skills
+            </div>
           </div>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
@@ -1451,7 +1476,29 @@
             font-weight: bold;
             font-family: var(--mono);
             font-size: 10px;
+            position: relative;
           }
+          .chase-comp {
+            fill: none;
+            stroke-width: 1.2;
+            stroke-linecap: round;
+            opacity: 0;
+          }
+          .chase-router { stroke: rgba(122,162,247, 0.4); }
+          .chase-child  { stroke: rgba(187,154,247, 0.4); }
+          @keyframes svg-chase-router {
+            0%   { stroke-dashoffset: 0;    opacity: 0.5; }
+            70%  { opacity: 0.3; }
+            100% { stroke-dashoffset: -370; opacity: 0; }
+          }
+          @keyframes svg-chase-child {
+            0%   { stroke-dashoffset: 0;    opacity: 0.5; }
+            70%  { opacity: 0.3; }
+            100% { stroke-dashoffset: -250; opacity: 0; }
+          }
+          :host(.active) .chase-router { animation: svg-chase-router 1.8s ease-out forwards; animation-delay: 0.15s; }
+          :host(.active) .chase-child  { animation: svg-chase-child  1.8s ease-out forwards; }
+          :host(.active) .chase-child.child-2 { animation-delay: 0.2s; }
 
           .node.router {
             background: #282f45;
@@ -1495,10 +1542,25 @@
                 <line x1="50%" y1="38%" x2="72%" y2="65%" stroke="var(--gray-60)" stroke-width="1.5"
                   stroke-dasharray="3,3" />
               </svg>
-              <div class="node router" style="z-index: 2;">Router: build-project</div>
+              <div class="node router" style="z-index: 2;">
+                <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+                  <rect class="chase-comp chase-router" width="100%" height="100%" rx="4" stroke-dasharray="40 9999"/>
+                </svg>
+                Router: build-project
+              </div>
               <div style="display: flex; gap: 30px; width: 100%; justify-content: space-around; z-index: 2;">
-                <div class="node child">client-build</div>
-                <div class="node child">server-build</div>
+                <div class="node child">
+                  <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+                    <rect class="chase-comp chase-child" width="100%" height="100%" rx="4" stroke-dasharray="30 9999"/>
+                  </svg>
+                  client-build
+                </div>
+                <div class="node child">
+                  <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible">
+                    <rect class="chase-comp chase-child child-2" width="100%" height="100%" rx="4" stroke-dasharray="30 9999"/>
+                  </svg>
+                  server-build
+                </div>
               </div>
             </div>
             <div class="bullets">
