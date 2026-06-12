@@ -753,48 +753,6 @@
       </template>
     </section>
 
-    <!-- SLIDE 25: Most common anti-pattern -->
-    <section class="slide" id="slide-25">
-      <template shadowrootmode="open">
-        <style>
-          @import url('style.css');
-        </style>
-        <img src="assets/slide_25_vite.jpeg"
-          style="position: absolute; left: 3.83px; top: 0px; width: 714.08px; height: 405px; z-index: 1; object-fit: fill;"
-          alt="">
-      </template>
-    </section>
-
-    <!-- SLIDE 26: Most common anti-pattern + DON'T -->
-    <section class="slide" id="slide-26">
-      <template shadowrootmode="open">
-        <style>
-          @import url('style.css');
-        </style>
-        <img src="assets/slide_25_vite.jpeg"
-          style="position: absolute; left: 3.83px; top: 0px; width: 714.08px; height: 405px; z-index: 1; object-fit: fill;"
-          alt="">
-        <div class="dont-overlay">
-          <div class="dont-circle"></div>
-          <div class="dont-text">DON'T</div>
-        </div>
-      </template>
-    </section>
-
-    <!-- SLIDE 27: Statement -->
-    <section class="slide" id="slide-27">
-      <template shadowrootmode="open">
-        <style>
-          @import url('style.css');
-        </style>
-        <div class="slide-content statement-layout">
-          <p class="statement-text">Skills are unnecessary if the agent already possesses the capability</p>
-        </div>
-        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
-            class="footer-center">July</span><span class="footer-right">2026</span></footer>
-      </template>
-    </section>
-
     <!-- SLIDE 28: Five Best Practices -->
     <section class="slide" id="slide-28">
       <template shadowrootmode="open">
@@ -1037,6 +995,7 @@
               </div>
             </div>
           </div>
+          <p style="font-size:8px;color:var(--gray-60);margin-top:8px;text-align:center;">Keep registries small — too many skills degrade selection accuracy. Large registries need retrieval filtering before the LLM sees them.</p>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
             class="footer-center">July</span><span class="footer-right">2026</span></footer>
@@ -1264,7 +1223,7 @@
 
           .node.child {
             background: #322e45;
-            color: var(--purple);
+            color: var(--white);
             border: 1px solid var(--purple);
           }
 
@@ -1314,6 +1273,48 @@
               </ul>
             </div>
           </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 25: Most common anti-pattern -->
+    <section class="slide" id="slide-25">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <img src="assets/slide_25_vite.jpeg"
+          style="position: absolute; left: 3.83px; top: 0px; width: 714.08px; height: 405px; z-index: 1; object-fit: fill;"
+          alt="">
+      </template>
+    </section>
+
+    <!-- SLIDE 26: Most common anti-pattern + DON'T -->
+    <section class="slide" id="slide-26">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <img src="assets/slide_25_vite.jpeg"
+          style="position: absolute; left: 3.83px; top: 0px; width: 714.08px; height: 405px; z-index: 1; object-fit: fill;"
+          alt="">
+        <div class="dont-overlay">
+          <div class="dont-circle"></div>
+          <div class="dont-text">DON'T</div>
+        </div>
+      </template>
+    </section>
+
+    <!-- SLIDE 27: Statement -->
+    <section class="slide" id="slide-27">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+        </style>
+        <div class="slide-content statement-layout">
+          <p class="statement-text">Skills are unnecessary if the agent already possesses the capability</p>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
             class="footer-center">July</span><span class="footer-right">2026</span></footer>
@@ -1532,7 +1533,7 @@ msg.add_attachment(
           <h2 class="slide-header">Skill evals</h2>
           <ul class="bullet-list">
             <li><strong>Identify goals</strong> - based on your skills identify goals for your agent</li>
-            <li><strong>Create tasks</strong> - provide "assignments" with context to achieve the goals</li>
+            <li><strong>Create tasks</strong> - provide "assignments" with context to achieve the goals; include negative cases where the skill should <em>not</em> trigger</li>
             <li><strong>Run trials</strong> - run 5-30 executions of the workflow</li>
             <li><strong>Grade</strong>
               <ul class="sub-list">
