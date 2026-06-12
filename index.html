@@ -1952,6 +1952,368 @@ msg.add_attachment(
       </template>
     </section>
 
+    <!-- SLIDE 39-1: Takeaways - CLIs over MCP -->
+    <section class="slide left-margin-31-7" id="slide-39-1">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+          .takeaway-list { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+          .takeaway-card { display: flex; align-items: center; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 7px 16px; transition: all 0.25s ease; opacity: 0; transform: translateY(8px); }
+          .takeaway-card.visible { opacity: 0.3; transform: translateY(0); }
+          .takeaway-card.active { opacity: 1; transform: translateY(0); background: rgba(122, 162, 247, 0.05); border-color: rgba(122, 162, 247, 0.25); }
+          .takeaway-num { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--gray-60); margin-right: 18px; width: 20px; }
+          .takeaway-card.active .takeaway-num { color: var(--cyan); }
+          .takeaway-content h3 { font-size: 13px; font-weight: 600; color: var(--gray-60); margin-bottom: 2px; margin-top: 0; }
+          .takeaway-card.active .takeaway-content h3 { color: var(--white); }
+          .takeaway-content p { font-size: 10.5px; color: var(--gray-60); margin: 0; }
+          .takeaway-card.active .takeaway-content p { color: var(--gray-95); }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Takeaways</h2>
+          <div class="takeaway-list">
+            <div class="takeaway-card active">
+              <div class="takeaway-num">01</div>
+              <div class="takeaway-content">
+                <h3>Prefer CLIs over MCP</h3>
+                <p>Extend agent toolsets securely with zero runtime daemon overhead.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">02</div>
+              <div class="takeaway-content">
+                <h3>Teach the Unknown Only</h3>
+                <p>Build skills for new workflows, avoiding redundant instruction bloat.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">03</div>
+              <div class="takeaway-content">
+                <h3>Apply the Five Practices</h3>
+                <p>Structure skills with deterministic steps, lean core files, and scripts.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">04</div>
+              <div class="takeaway-content">
+                <h3>Establish Automated Evals</h3>
+                <p>Measure agent performance using custom script and LLM graders.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">05</div>
+              <div class="takeaway-content">
+                <h3>Iterate via Hill Climbing</h3>
+                <p>Continuously run trials to systematically drive up pass rates.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 39-2: Takeaways - Teach the Unknown Only -->
+    <section class="slide left-margin-31-7" id="slide-39-2">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+          .takeaway-list { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+          .takeaway-card { display: flex; align-items: center; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 7px 16px; transition: all 0.25s ease; opacity: 0; transform: translateY(8px); }
+          .takeaway-card.visible { opacity: 0.3; transform: translateY(0); }
+          .takeaway-card.active { opacity: 1; transform: translateY(0); background: rgba(122, 162, 247, 0.05); border-color: rgba(122, 162, 247, 0.25); }
+          .takeaway-num { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--gray-60); margin-right: 18px; width: 20px; }
+          .takeaway-card.active .takeaway-num { color: var(--cyan); }
+          .takeaway-content h3 { font-size: 13px; font-weight: 600; color: var(--gray-60); margin-bottom: 2px; margin-top: 0; }
+          .takeaway-card.active .takeaway-content h3 { color: var(--white); }
+          .takeaway-content p { font-size: 10.5px; color: var(--gray-60); margin: 0; }
+          .takeaway-card.active .takeaway-content p { color: var(--gray-95); }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Takeaways</h2>
+          <div class="takeaway-list">
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">01</div>
+              <div class="takeaway-content">
+                <h3>Prefer CLIs over MCP</h3>
+                <p>Extend agent toolsets securely with zero runtime daemon overhead.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">02</div>
+              <div class="takeaway-content">
+                <h3>Teach the Unknown Only</h3>
+                <p>Build skills for new workflows, avoiding redundant instruction bloat.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">03</div>
+              <div class="takeaway-content">
+                <h3>Apply the Five Practices</h3>
+                <p>Structure skills with deterministic steps, lean core files, and scripts.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">04</div>
+              <div class="takeaway-content">
+                <h3>Establish Automated Evals</h3>
+                <p>Measure agent performance using custom script and LLM graders.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">05</div>
+              <div class="takeaway-content">
+                <h3>Iterate via Hill Climbing</h3>
+                <p>Continuously run trials to systematically drive up pass rates.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 39-3: Takeaways - Apply the Five Practices -->
+    <section class="slide left-margin-31-7" id="slide-39-3">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+          .takeaway-list { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+          .takeaway-card { display: flex; align-items: center; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 7px 16px; transition: all 0.25s ease; opacity: 0; transform: translateY(8px); }
+          .takeaway-card.visible { opacity: 0.3; transform: translateY(0); }
+          .takeaway-card.active { opacity: 1; transform: translateY(0); background: rgba(122, 162, 247, 0.05); border-color: rgba(122, 162, 247, 0.25); }
+          .takeaway-num { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--gray-60); margin-right: 18px; width: 20px; }
+          .takeaway-card.active .takeaway-num { color: var(--cyan); }
+          .takeaway-content h3 { font-size: 13px; font-weight: 600; color: var(--gray-60); margin-bottom: 2px; margin-top: 0; }
+          .takeaway-card.active .takeaway-content h3 { color: var(--white); }
+          .takeaway-content p { font-size: 10.5px; color: var(--gray-60); margin: 0; }
+          .takeaway-card.active .takeaway-content p { color: var(--gray-95); }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Takeaways</h2>
+          <div class="takeaway-list">
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">01</div>
+              <div class="takeaway-content">
+                <h3>Prefer CLIs over MCP</h3>
+                <p>Extend agent toolsets securely with zero runtime daemon overhead.</p>
+              </div>
+            </div>
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">02</div>
+              <div class="takeaway-content">
+                <h3>Teach the Unknown Only</h3>
+                <p>Build skills for new workflows, avoiding redundant instruction bloat.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">03</div>
+              <div class="takeaway-content">
+                <h3>Apply the Five Practices</h3>
+                <p>Structure skills with deterministic steps, lean core files, and scripts.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">04</div>
+              <div class="takeaway-content">
+                <h3>Establish Automated Evals</h3>
+                <p>Measure agent performance using custom script and LLM graders.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">05</div>
+              <div class="takeaway-content">
+                <h3>Iterate via Hill Climbing</h3>
+                <p>Continuously run trials to systematically drive up pass rates.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 39-4: Takeaways - Establish Automated Evals -->
+    <section class="slide left-margin-31-7" id="slide-39-4">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+          .takeaway-list { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+          .takeaway-card { display: flex; align-items: center; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 7px 16px; transition: all 0.25s ease; opacity: 0; transform: translateY(8px); }
+          .takeaway-card.visible { opacity: 0.3; transform: translateY(0); }
+          .takeaway-card.active { opacity: 1; transform: translateY(0); background: rgba(122, 162, 247, 0.05); border-color: rgba(122, 162, 247, 0.25); }
+          .takeaway-num { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--gray-60); margin-right: 18px; width: 20px; }
+          .takeaway-card.active .takeaway-num { color: var(--cyan); }
+          .takeaway-content h3 { font-size: 13px; font-weight: 600; color: var(--gray-60); margin-bottom: 2px; margin-top: 0; }
+          .takeaway-card.active .takeaway-content h3 { color: var(--white); }
+          .takeaway-content p { font-size: 10.5px; color: var(--gray-60); margin: 0; }
+          .takeaway-card.active .takeaway-content p { color: var(--gray-95); }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Takeaways</h2>
+          <div class="takeaway-list">
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">01</div>
+              <div class="takeaway-content">
+                <h3>Prefer CLIs over MCP</h3>
+                <p>Extend agent toolsets securely with zero runtime daemon overhead.</p>
+              </div>
+            </div>
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">02</div>
+              <div class="takeaway-content">
+                <h3>Teach the Unknown Only</h3>
+                <p>Build skills for new workflows, avoiding redundant instruction bloat.</p>
+              </div>
+            </div>
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">03</div>
+              <div class="takeaway-content">
+                <h3>Apply the Five Practices</h3>
+                <p>Structure skills with deterministic steps, lean core files, and scripts.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">04</div>
+              <div class="takeaway-content">
+                <h3>Establish Automated Evals</h3>
+                <p>Measure agent performance using custom script and LLM graders.</p>
+              </div>
+            </div>
+            <div class="takeaway-card">
+              <div class="takeaway-num">05</div>
+              <div class="takeaway-content">
+                <h3>Iterate via Hill Climbing</h3>
+                <p>Continuously run trials to systematically drive up pass rates.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 39-5: Takeaways - Iterate via Hill Climbing -->
+    <section class="slide left-margin-31-7" id="slide-39-5">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+          .takeaway-list { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+          .takeaway-card { display: flex; align-items: center; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 7px 16px; transition: all 0.25s ease; opacity: 0; transform: translateY(8px); }
+          .takeaway-card.visible { opacity: 0.3; transform: translateY(0); }
+          .takeaway-card.active { opacity: 1; transform: translateY(0); background: rgba(122, 162, 247, 0.05); border-color: rgba(122, 162, 247, 0.25); }
+          .takeaway-num { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--gray-60); margin-right: 18px; width: 20px; }
+          .takeaway-card.active .takeaway-num { color: var(--cyan); }
+          .takeaway-content h3 { font-size: 13px; font-weight: 600; color: var(--gray-60); margin-bottom: 2px; margin-top: 0; }
+          .takeaway-card.active .takeaway-content h3 { color: var(--white); }
+          .takeaway-content p { font-size: 10.5px; color: var(--gray-60); margin: 0; }
+          .takeaway-card.active .takeaway-content p { color: var(--gray-95); }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Takeaways</h2>
+          <div class="takeaway-list">
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">01</div>
+              <div class="takeaway-content">
+                <h3>Prefer CLIs over MCP</h3>
+                <p>Extend agent toolsets securely with zero runtime daemon overhead.</p>
+              </div>
+            </div>
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">02</div>
+              <div class="takeaway-content">
+                <h3>Teach the Unknown Only</h3>
+                <p>Build skills for new workflows, avoiding redundant instruction bloat.</p>
+              </div>
+            </div>
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">03</div>
+              <div class="takeaway-content">
+                <h3>Apply the Five Practices</h3>
+                <p>Structure skills with deterministic steps, lean core files, and scripts.</p>
+              </div>
+            </div>
+            <div class="takeaway-card visible">
+              <div class="takeaway-num">04</div>
+              <div class="takeaway-content">
+                <h3>Establish Automated Evals</h3>
+                <p>Measure agent performance using custom script and LLM graders.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">05</div>
+              <div class="takeaway-content">
+                <h3>Iterate via Hill Climbing</h3>
+                <p>Continuously run trials to systematically drive up pass rates.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 39-6: Takeaways Summary -->
+    <section class="slide left-margin-31-7" id="slide-39-6">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+          .takeaway-list { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+          .takeaway-card { display: flex; align-items: center; background: rgba(255, 255, 255, 0.01); border: 1px solid rgba(255, 255, 255, 0.03); border-radius: 6px; padding: 7px 16px; transition: all 0.25s ease; opacity: 0; transform: translateY(8px); }
+          .takeaway-card.active { opacity: 1; transform: translateY(0); background: rgba(122, 162, 247, 0.04); border-color: rgba(122, 162, 247, 0.2); }
+          .takeaway-num { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--cyan); margin-right: 18px; width: 20px; }
+          .takeaway-content h3 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 2px; margin-top: 0; }
+          .takeaway-content p { font-size: 10.5px; color: var(--gray-95); margin: 0; }
+        </style>
+        <div class="slide-content header-layout">
+          <h2 class="slide-header">Takeaways</h2>
+          <div class="takeaway-list">
+            <div class="takeaway-card active">
+              <div class="takeaway-num">01</div>
+              <div class="takeaway-content">
+                <h3>Prefer CLIs over MCP</h3>
+                <p>Extend agent toolsets securely with zero runtime daemon overhead.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">02</div>
+              <div class="takeaway-content">
+                <h3>Teach the Unknown Only</h3>
+                <p>Build skills for new workflows, avoiding redundant instruction bloat.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">03</div>
+              <div class="takeaway-content">
+                <h3>Apply the Five Practices</h3>
+                <p>Structure skills with deterministic steps, lean core files, and scripts.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">04</div>
+              <div class="takeaway-content">
+                <h3>Establish Automated Evals</h3>
+                <p>Measure agent performance using custom script and LLM graders.</p>
+              </div>
+            </div>
+            <div class="takeaway-card active">
+              <div class="takeaway-num">05</div>
+              <div class="takeaway-content">
+                <h3>Iterate via Hill Climbing</h3>
+                <p>Continuously run trials to systematically drive up pass rates.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
     <!-- SLIDE 40: Thank you! -->
     <section class="slide" id="slide-40">
       <template shadowrootmode="open">
