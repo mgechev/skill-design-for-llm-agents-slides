@@ -737,7 +737,7 @@
           @import url('style.css');
         </style>
         <div class="slide-content code-layout">
-          <h2 class="slide-header">How skills work?</h2>
+          <h2 class="slide-header">How do skills work?</h2>
           <div class="code-body">
             <pre class="code-block"><span class="line">skills := get_available_skills()</span>
 <span class="line">response := ask_llm_for_skills(skills, context)</span>
@@ -1359,23 +1359,18 @@
               <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
             </div>
             <div class="terminal-body mono"
-              style="padding-top: 18.48px; font-size: 9px; line-height: 1.25; white-space: pre;">res <span
-                class="py-op">=</span> requests.get(<span class="py-str">"..."</span>)
-              <span class="py-kw">with</span> <span class="py-fn">open</span>(<span class="py-str">"q2.csv"</span>,
-              <span class="py-str">"w"</span>) <span class="py-kw">as</span> f:
-              f.write(res.text)
+              style="padding-top: 18.48px; font-size: 9px; line-height: 1.25; white-space: pre;">res <span class="py-op">=</span> requests.get(<span class="py-str">"..."</span>)
+<span class="py-kw">with</span> <span class="py-fn">open</span>(<span class="py-str">"q2.csv"</span>, <span class="py-str">"w"</span>) <span class="py-kw">as</span> f:
+    f.write(res.text)
 
-              msg <span class="py-op">=</span> EmailMessage()
-              msg[<span class="py-str">"Subject"</span>] <span class="py-op">=</span> <span class="py-str">"Q2
-                Report"</span>
-              msg.add_attachment(
-              <span class="py-fn">open</span>(<span class="py-str">"q2.csv"</span>, <span
-                class="py-str">"rb"</span>).read(),
-              maintype<span class="py-op">=</span><span class="py-str">"text"</span>,
-              subtype<span class="py-op">=</span><span class="py-str">"csv"</span>,
-              filename<span class="py-op">=</span><span class="py-str">"q2.csv"</span>
-              )
-            </div>
+msg <span class="py-op">=</span> EmailMessage()
+msg[<span class="py-str">"Subject"</span>] <span class="py-op">=</span> <span class="py-str">"Q2 Report"</span>
+msg.add_attachment(
+    <span class="py-fn">open</span>(<span class="py-str">"q2.csv"</span>, <span class="py-str">"rb"</span>).read(),
+    maintype<span class="py-op">=</span><span class="py-str">"text"</span>,
+    subtype<span class="py-op">=</span><span class="py-str">"csv"</span>,
+    filename<span class="py-op">=</span><span class="py-str">"q2.csv"</span>
+)</div>
           </div>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
@@ -1600,12 +1595,10 @@
               <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
             </div>
             <div class="terminal-body s36-terminal"
-              style="padding-top: 18px; line-height: 29px; white-space: pre-wrap;"><span class="prompt">$</span> pnpm i
-              -g skillgrade
-              <span class="prompt">$</span> cd ~/skill-directory
-              <span class="prompt">$</span> skillgrade init
-              <span class="prompt">$</span> skillgrade
-            </div>
+              style="padding-top: 18px; line-height: 29px; white-space: pre-wrap;"><span class="prompt">$</span> pnpm i -g skillgrade
+<span class="prompt">$</span> cd ~/skill-directory
+<span class="prompt">$</span> skillgrade init
+<span class="prompt">$</span> skillgrade</div>
           </div>
           <ul class="bullet-list" style="position: absolute; left: 430.94px; top: 156.18px; margin: 0; padding: 0;">
             <li>Provide API key as env var</li>

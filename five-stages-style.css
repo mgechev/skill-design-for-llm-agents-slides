@@ -38,7 +38,7 @@ html {
 html, body { height: 100%; overflow: hidden; }
 
 body {
-  background: radial-gradient(ellipse at 50% 40%, #131720 0%, #0d1017 70%);
+  background: #000000;
   color: var(--text-primary);
   font-family: var(--font-mono);
   display: flex;
