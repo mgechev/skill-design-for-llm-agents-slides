@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>skillgrade · sqlite-ops</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --font: 'Inter', -apple-system, system-ui, sans-serif;
+      --mono: 'JetBrains Mono', 'Menlo', monospace;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --transition: 0.2s ease;
+      --bg: #f8f9fc;
+      --bg-card: #ffffff;
+      --bg-code: #f1f3f8;
+      --bg-hover: #f0f2f7;
+      --border: #e2e5ed;
+      --text: #1a1d27;
+      --text-secondary: #5c6370;
+      --text-muted: #9099a8;
+      --accent: #1a1d27;
+      --accent-hover: #333;
+      --green: #22c55e;
+      --green-bg: #ecfdf5;
+      --green-border: #bbf7d0;
+      --red: #ef4444;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --yellow: #f59e0b;
+      --yellow-bg: #fffbeb;
+      --purple: #6b7280;
+      --purple-bg: #f3f4f6;
+      --blue: #6b7280;
+      --blue-bg: #f3f4f6;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0c0d12;
+      --bg-card: #14161e;
+      --bg-code: #1a1d28;
+      --bg-hover: #1c1f2b;
+      --border: #262a38;
+      --text: #e4e7ef;
+      --text-secondary: #8b92a5;
+      --text-muted: #565d72;
+      --accent: #e4e7ef;
+      --accent-hover: #ccc;
+      --green: #34d87a;
+      --green-bg: #0c2618;
+      --green-border: #1a4a30;
+      --red: #f87171;
+      --red-bg: #2a1216;
+      --red-border: #4a2228;
+      --yellow: #fbbf24;
+      --yellow-bg: #261f0c;
+      --purple: #9ca3af;
+      --purple-bg: #1f2937;
+      --blue: #9ca3af;
+      --blue-bg: #1f2937;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    html { font-size: 15px; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+
+    .shell { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+
+    .theme-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Reports List ── */
+    .reports-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .report-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto auto;
+      gap: 1.25rem;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-decoration: none;
+      color: inherit;
+    }
+    .report-row:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+
+    .report-task { font-weight: 600; font-size: 0.95rem; }
+    .report-file { font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+    .report-metric { text-align: center; }
+    .report-metric .val { font-weight: 700; font-size: 1.1rem; }
+    .report-metric .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-pass { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .badge-fail { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+    .badge-type { background: var(--purple-bg); color: var(--purple); }
+    .badge-blue { background: var(--blue-bg); color: var(--blue); }
+
+    /* ── Detail View ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 1.25rem;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .detail-header { margin-bottom: 1.5rem; }
+    .detail-header h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; }
+
+    .detail-stats { display: flex; gap: 1.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+
+    .stat-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.6rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .stat-pill .val { font-weight: 700; font-size: 1.2rem; }
+    .stat-pill .lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── Trial Card ── */
+    .trial-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+
+    .trial-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.25rem;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .trial-header:hover { background: var(--bg-hover); }
+
+    .trial-number { font-weight: 700; font-size: 0.85rem; color: var(--text-muted); min-width: 4rem; }
+
+    .trial-reward { font-weight: 700; font-size: 1rem; }
+    .trial-reward.pass { color: var(--green); }
+    .trial-reward.fail { color: var(--red); }
+
+    .trial-meta {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-left: auto;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .trial-chevron { color: var(--text-muted); transition: transform var(--transition); font-size: 0.8rem; }
+    .trial-card.open .trial-chevron { transform: rotate(90deg); }
+
+    .trial-body { display: none; border-top: 1px solid var(--border); }
+    .trial-card.open .trial-body { display: block; }
+
+    /* ── Grader Results ── */
+    .graders-section { padding: 1rem 1.25rem; background: var(--bg-hover); }
+
+    .grader-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .grader-row:last-child { border-bottom: none; }
+
+    .grader-score { font-weight: 700; font-family: var(--mono); min-width: 3rem; }
+    .grader-score.pass { color: var(--green); }
+    .grader-score.fail { color: var(--red); }
+
+    .grader-weight { font-size: 0.75rem; color: var(--text-muted); font-family: var(--mono); }
+
+    .grader-details { flex: 1; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+
+    /* ── Session Log ── */
+    .log-section { padding: 0 1.25rem 1.25rem; }
+
+    .log-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 0;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: var(--font);
+      width: 100%;
+    }
+    .log-toggle:hover { text-decoration: underline; }
+
+    .log-entries { display: none; }
+    .log-entries.open { display: block; }
+
+    .log-entry {
+      border-left: 3px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 2px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      transition: background var(--transition);
+    }
+    .log-entry:hover { background: var(--bg-hover); }
+
+    .log-entry.agent_start { border-left-color: var(--purple); }
+    .log-entry.command { border-left-color: var(--blue); }
+    .log-entry.agent_result { border-left-color: var(--green); }
+    .log-entry.grader { border-left-color: var(--yellow); }
+    .log-entry.reward { border-left-color: var(--red); }
+
+    .log-label {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      margin-right: 0.5rem;
+      font-family: var(--mono);
+    }
+    .agent_start .log-label { background: var(--purple-bg); color: var(--purple); }
+    .command .log-label { background: var(--blue-bg); color: var(--blue); }
+    .agent_result .log-label { background: var(--green-bg); color: var(--green); }
+    .grader .log-label { background: var(--yellow-bg); color: var(--yellow); }
+    .reward .log-label { background: var(--red-bg); color: var(--red); }
+
+    .log-ts { font-size: 0.65rem; color: var(--text-muted); font-family: var(--mono); }
+    .log-content { margin-top: 0.35rem; }
+
+    pre.code-block {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      background: var(--bg-code);
+      padding: 0.6rem 0.75rem;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.5;
+      max-height: 350px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+    }
+
+    .cmd-line { font-family: var(--mono); color: var(--green); font-weight: 500; font-size: 0.85rem; }
+    .cmd-line::before { content: '$ '; color: var(--text-muted); }
+
+    .exit-badge { font-family: var(--mono); font-size: 0.7rem; margin-top: 0.25rem; }
+    .exit-badge.ok { color: var(--green); }
+    .exit-badge.err { color: var(--red); }
+
+    .stderr-text { color: var(--red); }
+
+    .reward-val { font-size: 1.4rem; font-weight: 700; }
+    .reward-val.pass { color: var(--green); }
+    .reward-val.fail { color: var(--red); }
+
+    .empty { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+    .spinner { display: flex; align-items: center; justify-content: center; padding: 4rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="shell" id="app">
+    <div class="topbar">
+      <h1><span style="color:var(--text)">skill</span><span style="color:var(--text-muted)">grade</span></h1>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">◐ Dark</button>
+    </div>
+    <div id="content"><div class="spinner">Loading…</div></div>
+  </div>
+
+  <script>
+    // ── Theme ──────────────────────────────────────────────────
+    function getTheme() {
+      try { return localStorage.getItem('sg-theme') || 'dark'; } catch { return 'dark'; }
+    }
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      try { localStorage.setItem('sg-theme', t); } catch {}
+      document.getElementById('themeBtn').textContent = t === 'dark' ? '☀ Light' : '◐ Dark';
+    }
+    function toggleTheme() { applyTheme(getTheme() === 'dark' ? 'light' : 'dark'); }
+    applyTheme(getTheme());
+
+    // ── Inline Report Data ─────────────────────────────────────
+    const REPORT = {
+      task: 'create-user-schema',
+      pass_rate: 0.8,
+      pass_at_k: 0.997,
+      pass_pow_k: 0.004,
+      skills_used: ['sqlite-ops'],
+      trials: [
+        {
+          trial_id: 1, reward: 0.95, duration_ms: 4200, n_commands: 3,
+          input_tokens: 1247, output_tokens: 823,
+          grader_results: [
+            { grader_type: 'deterministic', score: 1.00, weight: 0.5,
+              details: '4/4 checks passed\n  ✓ table_exists: users table found in database.db\n  ✓ schema_columns: All 4 columns present with correct types\n  ✓ sample_data: 3 rows found in users table\n  ✓ not_null_constraint: NOT NULL constraints verified on name and email' },
+            { grader_type: 'llm_rubric', score: 0.88, weight: 0.5,
+              details: 'The implementation is functionally complete with proper schema design. The agent used an efficient multi-row INSERT. Minor: email format validation is not enforced at the database level, which the rubric flags as a missed best practice. Sample data is realistic and diverse.' }
+          ],
+          session_log: [
+            { type: 'agent_start', timestamp: '2026-06-11T10:23:38.412Z',
+              instruction: 'Set up a SQLite user management database at ./database.db.\n\nRequirements:\n- Create a `users` table with the following columns:\n  - id (INTEGER PRIMARY KEY AUTOINCREMENT)\n  - name (TEXT NOT NULL)\n  - email (TEXT UNIQUE NOT NULL)\n  - created_at (TEXT DEFAULT CURRENT_TIMESTAMP)\n- Populate the table with at least 3 sample users with realistic data\n- Verify the setup by querying the table' },
+            { type: 'command', timestamp: '2026-06-11T10:23:39.218Z',
+              command: 'sqlite3 database.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);"',
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:23:40.105Z',
+              command: "sqlite3 database.db \"INSERT INTO users (name, email) VALUES ('Alice Johnson', 'alice@example.com'), ('Bob Smith', 'bob@example.com'), ('Carol Davis', 'carol@example.com');\"",
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:23:41.033Z',
+              command: 'sqlite3 database.db "SELECT id, name, email, created_at FROM users;"',
+              stdout: '1|Alice Johnson|alice@example.com|2026-06-11 10:23:40\n2|Bob Smith|bob@example.com|2026-06-11 10:23:40\n3|Carol Davis|carol@example.com|2026-06-11 10:23:40',
+              stderr: '', exitCode: 0 },
+            { type: 'agent_result', timestamp: '2026-06-11T10:23:41.844Z',
+              output: "I've created the `users` table in `database.db` with the required schema and inserted 3 sample users: Alice Johnson, Bob Smith, and Carol Davis. The SELECT query confirms all 3 rows were inserted correctly with auto-generated IDs and timestamps." },
+            { type: 'grader', timestamp: '2026-06-11T10:23:42.501Z',
+              grader_result: { grader_type: 'deterministic', score: 1.00, weight: 0.5, details: '4/4 checks passed\n  ✓ table_exists\n  ✓ schema_columns\n  ✓ sample_data (3 rows)\n  ✓ not_null_constraint' } },
+            { type: 'grader', timestamp: '2026-06-11T10:23:43.712Z',
+              grader_result: { grader_type: 'llm_rubric', score: 0.88, weight: 0.5, details: 'Functionally complete. Minor: email format validation not enforced at DB level.' } },
+            { type: 'reward', timestamp: '2026-06-11T10:23:43.714Z', value: 0.95 }
+          ]
+        },
+        {
+          trial_id: 2, reward: 0.87, duration_ms: 3800, n_commands: 4,
+          input_tokens: 1389, output_tokens: 912,
+          grader_results: [
+            { grader_type: 'deterministic', score: 0.90, weight: 0.5,
+              details: '3.6/4 checks passed\n  ✓ table_exists: users table found in database.db\n  ✓ schema_columns: All 4 columns present with correct types\n  ✓ sample_data: 3 rows found in users table\n  ~ not_null_constraint: Partial — constraints present but NOT NULL on email gave unexpected null warning in test harness' },
+            { grader_type: 'llm_rubric', score: 0.82, weight: 0.5,
+              details: 'Schema is correct and users were inserted successfully. The agent used separate INSERT statements rather than batching, which is slightly less efficient but produces the correct result. The verification step only checked the count rather than actual row values, missing an opportunity to confirm data integrity.' }
+          ],
+          session_log: [
+            { type: 'agent_start', timestamp: '2026-06-11T10:24:11.033Z',
+              instruction: 'Set up a SQLite user management database at ./database.db.\n\nRequirements:\n- Create a `users` table with the following columns:\n  - id (INTEGER PRIMARY KEY AUTOINCREMENT)\n  - name (TEXT NOT NULL)\n  - email (TEXT UNIQUE NOT NULL)\n  - created_at (TEXT DEFAULT CURRENT_TIMESTAMP)\n- Populate the table with at least 3 sample users with realistic data\n- Verify the setup by querying the table' },
+            { type: 'command', timestamp: '2026-06-11T10:24:12.201Z',
+              command: 'sqlite3 database.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);"',
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:12.988Z',
+              command: "sqlite3 database.db \"INSERT INTO users (name, email) VALUES ('John Doe', 'john.doe@company.com');\"",
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:13.741Z',
+              command: "sqlite3 database.db \"INSERT INTO users (name, email) VALUES ('Jane Smith', 'jane.smith@company.com'), ('Mike Brown', 'mike.b@example.org');\"",
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:14.502Z',
+              command: 'sqlite3 database.db "SELECT count(*) FROM users;"',
+              stdout: '3', stderr: '', exitCode: 0 },
+            { type: 'agent_result', timestamp: '2026-06-11T10:24:14.891Z',
+              output: "Created the `users` table with the correct schema including AUTOINCREMENT and NOT NULL constraints. Inserted 3 sample users using separate INSERT statements. The count query confirms 3 users are in the database." },
+            { type: 'grader', timestamp: '2026-06-11T10:24:15.603Z',
+              grader_result: { grader_type: 'deterministic', score: 0.90, weight: 0.5, details: '3.6/4 checks passed — partial on NOT NULL constraint test' } },
+            { type: 'grader', timestamp: '2026-06-11T10:24:16.812Z',
+              grader_result: { grader_type: 'llm_rubric', score: 0.82, weight: 0.5, details: 'Correct but verification only checked count, not row values.' } },
+            { type: 'reward', timestamp: '2026-06-11T10:24:16.814Z', value: 0.87 }
+          ]
+        },
+        {
+          trial_id: 3, reward: 0.35, duration_ms: 5100, n_commands: 7,
+          input_tokens: 2134, output_tokens: 1421,
+          grader_results: [
+            { grader_type: 'deterministic', score: 0.50, weight: 0.5,
+              details: '2/4 checks passed\n  ✓ table_exists: users table found in database.db\n  ✓ schema_columns: All 4 columns present with correct types\n  ✗ sample_data: 0 rows found, expected at least 3\n  ✗ not_null_constraint: Cannot verify constraint behavior without sample data' },
+            { grader_type: 'llm_rubric', score: 0.20, weight: 0.5,
+              details: 'Agent created the table but did not insert the required sample data. The task explicitly requested at least 3 sample users to be populated. The agent spent extra steps verifying the schema and adding an unnecessary index, but missed the core data population requirement entirely.' }
+          ],
+          session_log: [
+            { type: 'agent_start', timestamp: '2026-06-11T10:24:55.117Z',
+              instruction: 'Set up a SQLite user management database at ./database.db.\n\nRequirements:\n- Create a `users` table with the following columns:\n  - id (INTEGER PRIMARY KEY AUTOINCREMENT)\n  - name (TEXT NOT NULL)\n  - email (TEXT UNIQUE NOT NULL)\n  - created_at (TEXT DEFAULT CURRENT_TIMESTAMP)\n- Populate the table with at least 3 sample users with realistic data\n- Verify the setup by querying the table' },
+            { type: 'command', timestamp: '2026-06-11T10:24:56.304Z',
+              command: 'sqlite3 database.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);"',
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:57.012Z',
+              command: 'sqlite3 database.db ".schema users"',
+              stdout: 'CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);',
+              stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:57.788Z',
+              command: 'sqlite3 database.db "PRAGMA table_info(users);"',
+              stdout: '0|id|INTEGER|0||1\n1|name|TEXT|1||0\n2|email|TEXT|1||0\n3|created_at|TEXT|0|CURRENT_TIMESTAMP|0',
+              stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:58.541Z',
+              command: 'sqlite3 database.db "CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);"',
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:59.201Z',
+              command: 'sqlite3 database.db "PRAGMA integrity_check;"',
+              stdout: 'ok', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:24:59.877Z',
+              command: 'sqlite3 database.db ".tables"',
+              stdout: 'users', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:25:00.433Z',
+              command: 'sqlite3 database.db "SELECT count(*) FROM users;"',
+              stdout: '0', stderr: '', exitCode: 0 },
+            { type: 'agent_result', timestamp: '2026-06-11T10:25:00.217Z',
+              output: "I've set up the SQLite database at `database.db`. The `users` table has been created with the correct schema: id (INTEGER PRIMARY KEY AUTOINCREMENT), name (TEXT NOT NULL), email (TEXT UNIQUE NOT NULL), and created_at (TEXT DEFAULT CURRENT_TIMESTAMP). I also added an index on the email column for better query performance. The integrity check passed and the table structure is verified." },
+            { type: 'grader', timestamp: '2026-06-11T10:25:01.603Z',
+              grader_result: { grader_type: 'deterministic', score: 0.50, weight: 0.5, details: '2/4 checks passed — table exists with correct schema, but 0 sample rows found' } },
+            { type: 'grader', timestamp: '2026-06-11T10:25:03.911Z',
+              grader_result: { grader_type: 'llm_rubric', score: 0.20, weight: 0.5, details: 'Agent created the table but did not insert the required sample data. The task explicitly requested at least 3 sample users to be populated.' } },
+            { type: 'reward', timestamp: '2026-06-11T10:25:03.914Z', value: 0.35 }
+          ]
+        },
+        {
+          trial_id: 4, reward: 0.91, duration_ms: 4500, n_commands: 3,
+          input_tokens: 1198, output_tokens: 756,
+          grader_results: [
+            { grader_type: 'deterministic', score: 1.00, weight: 0.5,
+              details: '4/4 checks passed\n  ✓ table_exists: users table found in database.db\n  ✓ schema_columns: All 4 columns present with correct types\n  ✓ sample_data: 3 rows found in users table\n  ✓ not_null_constraint: NOT NULL constraints verified on name and email' },
+            { grader_type: 'llm_rubric', score: 0.76, weight: 0.5,
+              details: 'Task completed correctly. Schema matches all requirements and 3 users were inserted. The verification query did not include the created_at field, missing a chance to confirm the DEFAULT CURRENT_TIMESTAMP is functioning. Sample data could be slightly more diverse — all three users share a similar naming convention.' }
+          ],
+          session_log: [
+            { type: 'agent_start', timestamp: '2026-06-11T10:25:30.044Z',
+              instruction: 'Set up a SQLite user management database at ./database.db.\n\nRequirements:\n- Create a `users` table with the following columns:\n  - id (INTEGER PRIMARY KEY AUTOINCREMENT)\n  - name (TEXT NOT NULL)\n  - email (TEXT UNIQUE NOT NULL)\n  - created_at (TEXT DEFAULT CURRENT_TIMESTAMP)\n- Populate the table with at least 3 sample users with realistic data\n- Verify the setup by querying the table' },
+            { type: 'command', timestamp: '2026-06-11T10:25:31.188Z',
+              command: 'sqlite3 database.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);"',
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:25:32.044Z',
+              command: "sqlite3 database.db \"INSERT INTO users (name, email) VALUES ('Emma Wilson', 'emma.wilson@mail.com'), ('David Chen', 'david.chen@tech.io'), ('Sarah Park', 'sarah.park@example.net');\"",
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:25:33.501Z',
+              command: 'sqlite3 database.db "SELECT id, name, email FROM users LIMIT 5;"',
+              stdout: '1|Emma Wilson|emma.wilson@mail.com\n2|David Chen|david.chen@tech.io\n3|Sarah Park|sarah.park@example.net',
+              stderr: '', exitCode: 0 },
+            { type: 'agent_result', timestamp: '2026-06-11T10:25:34.211Z',
+              output: "Database setup complete. The `users` table was created with the required schema and 3 sample users have been inserted. Verification confirms the data is correctly stored with auto-incremented IDs." },
+            { type: 'grader', timestamp: '2026-06-11T10:25:35.001Z',
+              grader_result: { grader_type: 'deterministic', score: 1.00, weight: 0.5, details: '4/4 checks passed' } },
+            { type: 'grader', timestamp: '2026-06-11T10:25:36.488Z',
+              grader_result: { grader_type: 'llm_rubric', score: 0.76, weight: 0.5, details: 'Correct but verification missed the created_at field. Sample data could be more diverse.' } },
+            { type: 'reward', timestamp: '2026-06-11T10:25:36.490Z', value: 0.91 }
+          ]
+        },
+        {
+          trial_id: 5, reward: 0.93, duration_ms: 3900, n_commands: 3,
+          input_tokens: 1312, output_tokens: 847,
+          grader_results: [
+            { grader_type: 'deterministic', score: 0.95, weight: 0.5,
+              details: '3.8/4 checks passed\n  ✓ table_exists: users table found in database.db\n  ✓ schema_columns: All 4 columns present with correct types\n  ✓ sample_data: 3 rows found in users table\n  ~ not_null_constraint: Pass with minor edge case in constraint validation — 0.75 partial' },
+            { grader_type: 'llm_rubric', score: 0.89, weight: 0.5,
+              details: 'Excellent implementation. Schema is correct with all required constraints. Sample data is realistic and well-structured with diverse names and email domains. The agent explicitly confirmed the DEFAULT CURRENT_TIMESTAMP behavior in its output, showing good understanding of the schema requirements.' }
+          ],
+          session_log: [
+            { type: 'agent_start', timestamp: '2026-06-11T10:26:00.812Z',
+              instruction: 'Set up a SQLite user management database at ./database.db.\n\nRequirements:\n- Create a `users` table with the following columns:\n  - id (INTEGER PRIMARY KEY AUTOINCREMENT)\n  - name (TEXT NOT NULL)\n  - email (TEXT UNIQUE NOT NULL)\n  - created_at (TEXT DEFAULT CURRENT_TIMESTAMP)\n- Populate the table with at least 3 sample users with realistic data\n- Verify the setup by querying the table' },
+            { type: 'command', timestamp: '2026-06-11T10:26:01.744Z',
+              command: 'sqlite3 database.db "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP);"',
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:26:02.588Z',
+              command: "sqlite3 database.db \"INSERT INTO users (name, email) VALUES ('Mia Torres', 'mia.t@designco.com'), ('Liam Anderson', 'l.anderson@startup.io'), ('Priya Patel', 'priya.patel@corp.net');\"",
+              stdout: '', stderr: '', exitCode: 0 },
+            { type: 'command', timestamp: '2026-06-11T10:26:03.401Z',
+              command: 'sqlite3 database.db "SELECT id, name, email, created_at FROM users;"',
+              stdout: '1|Mia Torres|mia.t@designco.com|2026-06-11 10:26:02\n2|Liam Anderson|l.anderson@startup.io|2026-06-11 10:26:02\n3|Priya Patel|priya.patel@corp.net|2026-06-11 10:26:02',
+              stderr: '', exitCode: 0 },
+            { type: 'agent_result', timestamp: '2026-06-11T10:26:04.112Z',
+              output: "Successfully created the `users` table with all required columns and constraints (AUTOINCREMENT primary key, NOT NULL on name and email, UNIQUE email, DEFAULT CURRENT_TIMESTAMP for created_at). Inserted 3 diverse sample users and the SELECT query confirms created_at defaulted to the current timestamp automatically." },
+            { type: 'grader', timestamp: '2026-06-11T10:26:05.002Z',
+              grader_result: { grader_type: 'deterministic', score: 0.95, weight: 0.5, details: '3.8/4 checks passed — minor partial on constraint edge case' } },
+            { type: 'grader', timestamp: '2026-06-11T10:26:06.318Z',
+              grader_result: { grader_type: 'llm_rubric', score: 0.89, weight: 0.5, details: 'Excellent. Diverse sample data, confirmed DEFAULT CURRENT_TIMESTAMP in output.' } },
+            { type: 'reward', timestamp: '2026-06-11T10:26:06.320Z', value: 0.93 }
+          ]
+        }
+      ]
+    };
+
+    // ── Helpers ────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const esc = s => s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+
+    // ── Router ─────────────────────────────────────────────────
+    function navigate(view, data) {
+      if (view === 'list') renderList();
+      else if (view === 'detail') renderDetail(REPORT);
+    }
+
+    // ── List View ──────────────────────────────────────────────
+    function renderList() {
+      const r = REPORT;
+      const pr = (r.pass_rate * 100).toFixed(0);
+      const isPass = r.pass_rate >= 0.5;
+      const rows = `<a class="report-row" onclick="navigate('detail')" href="javascript:void(0)">
+        <div>
+          <div class="report-task">${esc(r.task)}</div>
+          <div class="report-file">2026-06-11T10:23:38</div>
+        </div>
+        <div class="report-metric"><div class="val">${pr}%</div><div class="lbl">Pass Rate</div></div>
+        <div class="report-metric"><div class="val">${r.trials.length}</div><div class="lbl">Trials</div></div>
+        <div class="report-metric"><div class="val">${(r.pass_at_k * 100).toFixed(0)}%</div><div class="lbl">pass@k</div></div>
+        <div class="report-metric"><div class="val">${(r.pass_pow_k * 100).toFixed(1)}%</div><div class="lbl">pass^k</div></div>
+        <div><span class="badge ${isPass ? 'badge-pass' : 'badge-fail'}">${isPass ? 'PASS' : 'FAIL'}</span></div>
+      </a>`;
+      $('content').innerHTML = '<div class="reports-grid">' + rows + '</div>';
+    }
+
+    // ── Detail View ────────────────────────────────────────────
+    function renderDetail(r) {
+      const avgDur = r.trials.reduce((s, t) => s + (t.duration_ms || 0), 0) / r.trials.length;
+      const totalTokens = r.trials.reduce((s, t) => s + (t.input_tokens || 0) + (t.output_tokens || 0), 0);
+
+      const stats = `
+        <div class="stat-pill"><div class="val">${(r.pass_rate * 100).toFixed(1)}%</div><div class="lbl">Pass Rate</div></div>
+        <div class="stat-pill"><div class="val">${(r.pass_at_k * 100).toFixed(1)}%</div><div class="lbl">pass@k</div></div>
+        <div class="stat-pill"><div class="val">${(r.pass_pow_k * 100).toFixed(1)}%</div><div class="lbl">pass^k</div></div>
+        <div class="stat-pill"><div class="val">${(avgDur / 1000).toFixed(1)}s</div><div class="lbl">Avg Duration</div></div>
+        <div class="stat-pill"><div class="val">~${Math.round(totalTokens / 1000)}k</div><div class="lbl">Total Tokens</div></div>
+        <div class="stat-pill"><div class="val">${esc(r.skills_used?.join(', ') || 'none')}</div><div class="lbl">Skills</div></div>`;
+
+      const trials = r.trials.map((t, i) => renderTrial(t, i)).join('');
+
+      $('content').innerHTML = `
+        <a class="back-link" href="javascript:void(0)" onclick="navigate('list')">← All Reports</a>
+        <div class="detail-header">
+          <h2>${esc(r.task)}</h2>
+          <div class="detail-stats">${stats}</div>
+        </div>
+        ${trials}`;
+    }
+
+    function renderTrial(t, idx) {
+      const pass = t.reward >= 0.5;
+      const dur = ((t.duration_ms || 0) / 1000).toFixed(1);
+      const tokens = (t.input_tokens || 0) + (t.output_tokens || 0);
+
+      const graders = (t.grader_results || []).map(g => `
+        <div class="grader-row">
+          <span class="badge badge-type">${esc(g.grader_type)}</span>
+          <span class="grader-score ${g.score >= 0.5 ? 'pass' : 'fail'}">${g.score.toFixed(2)}</span>
+          <span class="grader-weight">×${g.weight}</span>
+          <div class="grader-details">${esc(g.details)}</div>
+        </div>`).join('');
+
+      const logId = 'log-' + idx;
+      const logs = (t.session_log || []).map(e => renderLogEntry(e)).join('');
+
+      return `
+        <div class="trial-card" id="trial-${idx}">
+          <div class="trial-header" onclick="toggleTrial(${idx})">
+            <span class="trial-number">Trial ${t.trial_id}</span>
+            <span class="trial-reward ${pass ? 'pass' : 'fail'}">${t.reward.toFixed(2)}</span>
+            <span class="badge ${pass ? 'badge-pass' : 'badge-fail'}">${pass ? 'PASS' : 'FAIL'}</span>
+            <span class="trial-meta">
+              <span>${dur}s</span>
+              <span>${t.n_commands || 0} cmds</span>
+              <span>~${tokens} tokens</span>
+            </span>
+            <span class="trial-chevron">▶</span>
+          </div>
+          <div class="trial-body">
+            ${graders ? '<div class="graders-section">' + graders + '</div>' : ''}
+            <div class="log-section">
+              <button class="log-toggle" onclick="toggleLog('${logId}')">▶ Session Log (${t.session_log?.length || 0} entries)</button>
+              <div class="log-entries" id="${logId}">${logs}</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderLogEntry(e) {
+      let body = '';
+      switch (e.type) {
+        case 'agent_start':
+          body = '<pre class="code-block">' + esc(e.instruction || '') + '</pre>';
+          break;
+        case 'command':
+          body = '<div class="cmd-line">' + esc(e.command || '') + '</div>'
+            + '<pre class="code-block">' + esc(e.stdout || '')
+            + (e.stderr ? '<span class="stderr-text">' + esc(e.stderr) + '</span>' : '')
+            + '</pre>'
+            + '<div class="exit-badge ' + (e.exitCode === 0 ? 'ok' : 'err') + '">exit ' + (e.exitCode ?? '?') + '</div>';
+          break;
+        case 'agent_result':
+          body = '<pre class="code-block">' + esc(e.output || '') + '</pre>';
+          break;
+        case 'grader':
+          if (e.grader_result) {
+            const g = e.grader_result;
+            body = '<span class="grader-score ' + (g.score >= 0.5 ? 'pass' : 'fail') + '">'
+              + g.score.toFixed(2) + '</span> '
+              + '<span class="badge badge-type">' + esc(g.grader_type) + '</span> '
+              + '<span class="grader-details">' + esc(g.details) + '</span>';
+          }
+          break;
+        case 'reward':
+          body = '<span class="reward-val ' + ((e.value || 0) >= 0.5 ? 'pass' : 'fail') + '">'
+            + (e.value?.toFixed(2) || '0.00') + '</span>';
+          break;
+      }
+      return '<div class="log-entry ' + e.type + '">'
+        + '<span class="log-label">' + e.type + '</span>'
+        + '<span class="log-ts">' + (e.timestamp || '') + '</span>'
+        + '<div class="log-content">' + body + '</div>'
+        + '</div>';
+    }
+
+    // ── Interactions ───────────────────────────────────────────
+    function toggleTrial(idx) {
+      document.getElementById('trial-' + idx).classList.toggle('open');
+    }
+    function toggleLog(id) {
+      const el = document.getElementById(id);
+      el.classList.toggle('open');
+      const btn = el.previousElementSibling;
+      btn.textContent = btn.textContent.replace(/^[▶▼] /, el.classList.contains('open') ? '▼ ' : '▶ ');
+    }
+
+    // ── Init ───────────────────────────────────────────────────
+    navigate('list');
+  </script>
+</body>
+</html>
