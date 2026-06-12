@@ -114,6 +114,41 @@
       <template shadowrootmode="open">
         <style>
           @import url('style.css');
+
+          @property --sweep-angle {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: -45deg;
+          }
+          @keyframes border-sweep {
+            from { --sweep-angle: -45deg; opacity: 0.9; }
+            80%  { opacity: 0.7; }
+            to   { --sweep-angle: 315deg; opacity: 0; }
+          }
+          .diagram .node, .diagram .tools-card { isolation: isolate; }
+          .diagram .node::before, .diagram .tools-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1px;
+            border-radius: inherit;
+            box-sizing: border-box;
+            background: conic-gradient(
+              from var(--sweep-angle) at 50% 50%,
+              transparent 0%, rgba(122,162,247,.55) 12%,
+              rgba(122,162,247,.2) 22%, transparent 30%, transparent 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0;
+          }
+          :host(.active) .diagram .node::before,
+          :host(.active) .diagram .tools-card::before {
+            animation: border-sweep 1.8s ease-out forwards;
+          }
         </style>
         <div class="slide-content header-layout">
           <h2 class="slide-header">How agents work?</h2>
@@ -149,6 +184,41 @@
       <template shadowrootmode="open">
         <style>
           @import url('style.css');
+
+          @property --sweep-angle {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: -45deg;
+          }
+          @keyframes border-sweep {
+            from { --sweep-angle: -45deg; opacity: 0.9; }
+            80%  { opacity: 0.7; }
+            to   { --sweep-angle: 315deg; opacity: 0; }
+          }
+          .diagram .node, .diagram .tools-card { isolation: isolate; }
+          .diagram .node::before, .diagram .tools-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 1px;
+            border-radius: inherit;
+            box-sizing: border-box;
+            background: conic-gradient(
+              from var(--sweep-angle) at 50% 50%,
+              transparent 0%, rgba(122,162,247,.55) 12%,
+              rgba(122,162,247,.2) 22%, transparent 30%, transparent 100%
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0;
+          }
+          :host(.active) .diagram .node::before,
+          :host(.active) .diagram .tools-card::before {
+            animation: border-sweep 1.8s ease-out forwards;
+          }
         </style>
         <div class="slide-content header-layout">
           <h2 class="slide-header">How agents work?<span class="sub">Model Context Protocol</span></h2>
@@ -996,6 +1066,175 @@
             </div>
           </div>
           <p style="font-size:8px;color:var(--gray-60);margin-top:8px;text-align:center;">Keep registries small — too many skills degrade selection accuracy. Large registries need retrieval filtering before the LLM sees them.</p>
+        </div>
+        <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
+            class="footer-center">July</span><span class="footer-right">2026</span></footer>
+      </template>
+    </section>
+
+    <!-- SLIDE 28-2a: Registry size & accuracy -->
+    <section class="slide" id="slide-28-2a">
+      <template shadowrootmode="open">
+        <style>
+          @import url('style.css');
+
+          .registry-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+          }
+
+          .chart-panel {
+            background: var(--code-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 12px;
+            height: 230px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .chart-title {
+            font-size: 8.5px;
+            color: var(--gray-60);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 10px;
+          }
+
+          .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 7px;
+          }
+
+          .bar-label {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            color: var(--gray-60);
+            width: 42px;
+            text-align: right;
+            flex-shrink: 0;
+          }
+
+          .bar-track {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 2px;
+            height: 18px;
+          }
+
+          @keyframes growBar {
+            from { width: 0; }
+            to   { width: var(--w); }
+          }
+
+          .bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            padding-left: 7px;
+            font-size: 8px;
+            font-family: var(--mono);
+            color: var(--white);
+            font-weight: 600;
+            width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+
+          :host(.active) .bar-fill {
+            animation: growBar 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+          }
+
+          :host(.active) .bar-row:nth-child(3) .bar-fill { animation-delay: 0.11s; }
+          :host(.active) .bar-row:nth-child(4) .bar-fill { animation-delay: 0.22s; }
+          :host(.active) .bar-row:nth-child(5) .bar-fill { animation-delay: 0.33s; }
+
+          .bar-fill.high  { background: rgba(158, 206, 106, 0.35); }
+          .bar-fill.mid   { background: rgba(224, 175, 104, 0.35); }
+          .bar-fill.low   { background: rgba(247, 118, 142, 0.35); }
+
+          .thresholds-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+            height: 230px;
+          }
+
+          .threshold-card {
+            border-radius: 6px;
+            padding: 9px 12px;
+            border: 1px solid;
+          }
+
+          .threshold-card.ok     { background: rgba(158, 206, 106, 0.04); border-color: rgba(158, 206, 106, 0.2); }
+          .threshold-card.warn   { background: rgba(224, 175, 104, 0.04); border-color: rgba(224, 175, 104, 0.2); }
+          .threshold-card.danger { background: rgba(247, 118, 142, 0.04); border-color: rgba(247, 118, 142, 0.2); }
+
+          .threshold-num {
+            font-family: var(--mono);
+            font-size: 17px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 3px;
+          }
+
+          .threshold-card.ok     .threshold-num { color: var(--green); }
+          .threshold-card.warn   .threshold-num { color: var(--yellow); }
+          .threshold-card.danger .threshold-num { color: var(--red); }
+
+          .threshold-desc {
+            font-size: 9px;
+            color: var(--gray-60);
+            line-height: 1.35;
+          }
+        </style>
+        <div class="slide-content" style="padding: 25px 25px;">
+          <h2 class="slide-header" style="margin: 0 0 10px 0; font-size: 20px;">Registry Size &amp; Accuracy</h2>
+          <div class="registry-grid">
+            <div class="chart-panel">
+              <div>
+                <div class="chart-title">Task reward by library size — Graph-of-Skills (2025)</div>
+                <div class="bar-row">
+                  <div class="bar-label">200</div>
+                  <div class="bar-track"><div class="bar-fill high" style="--w:80%">32.5%</div></div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">500</div>
+                  <div class="bar-track"><div class="bar-fill mid" style="--w:64%">26.0%</div></div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">1,000</div>
+                  <div class="bar-track"><div class="bar-fill low" style="--w:67%">27.4%</div></div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">2,000</div>
+                  <div class="bar-track"><div class="bar-fill low" style="--w:65%">26.7%</div></div>
+                </div>
+              </div>
+              <div style="font-size:7.5px;color:var(--gray-60);">Token cost grows 3× from 500→2,000 skills with no accuracy gain.</div>
+            </div>
+            <div class="thresholds-panel">
+              <div class="threshold-card ok">
+                <span class="threshold-num">≤ 20–30</span>
+                <div class="threshold-desc">Safe for direct LLM exposure — all skills fit without selection degradation.</div>
+              </div>
+              <div class="threshold-card warn">
+                <span class="threshold-num">~200</span>
+                <div class="threshold-desc">Accuracy plateaus and drops. A retrieval filter is needed before skills reach the LLM.</div>
+              </div>
+              <div class="threshold-card danger">
+                <span class="threshold-num">500+</span>
+                <div class="threshold-desc">6 pp accuracy drop vs. 200. Token cost triples. Full exposure becomes infeasible.</div>
+              </div>
+            </div>
+          </div>
         </div>
         <footer class="slide-footer"><span class="footer-left">AI Coding Summit</span><span
             class="footer-center">July</span><span class="footer-right">2026</span></footer>
