@@ -68,7 +68,11 @@
       --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
     }
 
-    html { font-size: 15px; }
+    html {
+      font-size: 10px;
+      scrollbar-width: none;
+    }
+    html::-webkit-scrollbar { display: none; }
 
     body {
       font-family: var(--font);
@@ -76,8 +80,10 @@
       color: var(--text);
       line-height: 1.6;
       transition: background var(--transition), color var(--transition);
-      min-height: 100vh;
+      overflow-x: hidden;
+      scrollbar-width: none;
     }
+    body::-webkit-scrollbar { display: none; }
 
     .shell { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
 
